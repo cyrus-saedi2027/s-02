@@ -54,6 +54,48 @@ ${defs(id)}
 ${inner}
 </svg>`;
 
+/**
+ * The same plate, alive.
+ *
+ * An SVG rendered through <img> runs the CSS inside it, so the motion needs no
+ * script and nothing on the page has to drive it — the wall mounts one of
+ * these only while the pointer is over a tile, and unmounting is what stops it.
+ *
+ * Deliberately not a frame strip: six frames of each plate would have been six
+ * times the artwork, and this build inlines every byte of it. Two moves do the
+ * work instead, and they are motif-agnostic — the whole composition breathes,
+ * and a soft band travels down over it. Every plate reads as a live capture
+ * without a line of per-motif code.
+ */
+const liveFrame = (id, w, h, inner) =>
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" role="img">
+${defs(id)}
+  <defs>
+    <linearGradient id="scan${id}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#fff" stop-opacity="0.09"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <style>
+    .breathe { transform-origin: 50% 50%; animation: breathe 7s ease-in-out infinite alternate; }
+    @keyframes breathe {
+      from { transform: scale(1.015) translate(-0.6%, 0.4%); }
+      to   { transform: scale(1.055) translate(0.6%, -0.6%); }
+    }
+    .scan { animation: scan 3.4s linear infinite; }
+    @keyframes scan {
+      from { transform: translateY(-${n(h * 0.35)}px); }
+      to   { transform: translateY(${n(h * 1.05)}px); }
+    }
+  </style>
+  <rect width="${w}" height="${h}" fill="#0a0a0b"/>
+  <g class="breathe">
+${inner}
+  </g>
+  <rect class="scan" width="${w}" height="${n(h * 0.3)}" fill="url(#scan${id})"/>
+</svg>`;
+
 /* ------------------------------------------------------------------ motifs
  *
  * Each motif fills the frame edge to edge and places its focal point off
@@ -199,6 +241,15 @@ const write = (name, w, h, motif, seed) => {
   count++;
 };
 
+/** Writes the still and, beside it, the `-live` twin the wall plays on hover. */
+const writePair = (name, w, h, motif, seed) => {
+  const id = name.replace(/[^a-z0-9]/gi, "");
+  const inner = motif(id, w, h, seed);
+  fs.writeFileSync(path.join(OUT, name), frame(id, w, h, inner));
+  fs.writeFileSync(path.join(OUT, name.replace(/\.svg$/, "-live.svg")), liveFrame(id, w, h, inner));
+  count += 2;
+};
+
 // Capabilities panels — tall, one motif each.
 ["strategy", "design", "development", "production"].forEach((slug, i) => {
   write(`panel-${slug}.svg`, 600, 760, MOTIFS[[3, 1, 2, 5][i]], 1000 + i * 137);
@@ -234,8 +285,8 @@ const playShapes = [
   [900, 687], [1350, 1095], [1350, 1095], [900, 687], [900, 1027],
 ];
 playShapes.forEach(([w, h], i) => {
-  write(`play-${String(i + 1).padStart(2, "0")}.svg`, w, h,
-        MOTIFS[[0, 2, 5, 3, 1, 4, 0, 5, 2, 1, 3, 4, 5][i]], 5000 + i * 197);
+  writePair(`play-${String(i + 1).padStart(2, "0")}.svg`, w, h,
+            MOTIFS[[0, 2, 5, 3, 1, 4, 0, 5, 2, 1, 3, 4, 5][i]], 5000 + i * 197);
 });
 
 console.log(`wrote ${count} files to ${path.relative(ROOT, OUT)}`);

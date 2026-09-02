@@ -43,11 +43,18 @@ These change what the site *says*, which is where the biggest gap is.
       Only when the plate is on screen, and only forwards — coming back plays
       the ordinary wipe.
 
-- [ ] **5. Live previews on the playground wall.** A short, silent video that
-      plays only on hover, so a study can show its motion instead of a still.
+- [x] **5. Live previews on the playground wall.** Each study has a `-live`
+      twin carrying its own CSS animation — the composition breathes and a soft
+      band travels down it. Mounted only while the pointer is on a tile, so it
+      is not fetched until asked for and unmounting is what stops it. Not a
+      frame strip: six frames of each plate would have been six times the
+      artwork, and this build inlines every byte. Skipped entirely under
+      reduced motion.
 
-- [ ] **6. Magnetic pull on images.** The plates lean toward the pointer the
-      way the buttons already do, tying the two interactions together.
+- [x] **6. Magnetic pull on images.** `usePointerLean` gives the plates the
+      lean `MagneticButton` has always had, so the work answers the pointer the
+      way the controls do. Measured: 21.6px on a project plate, 5.4px on a wall
+      tile (they sit shoulder to shoulder), 0 under reduced motion.
 
 - [ ] **7. Sound, off by default.** A soft click on the menu and a low sweep on
       the page change, behind a control the visitor turns on.

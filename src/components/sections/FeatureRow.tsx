@@ -3,6 +3,7 @@ import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 import { MagneticButton } from "../ui/MagneticButton";
 import type { Project } from "@/data/site";
 import { useReducedMotion } from "@/hooks/useMediaQuery";
+import { usePointerLean } from "@/hooks/usePointerLean";
 
 /**
  * Where the covers pivot from. `50% 180%` sits a little over one card-height
@@ -55,6 +56,7 @@ export function FeatureRow({
   const Heading = `h${headingLevel}` as "h2" | "h3";
   const ref = useRef<HTMLDivElement>(null);
   const calm = useReducedMotion();
+  const lean = usePointerLean();
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "center center"],
@@ -102,7 +104,13 @@ export function FeatureRow({
         // The handle the click handler finds this plate by, so it can lend it
         // its view-transition-name on the way into the project page.
         data-project-cover={project.slug}
-        style={{ rotate, scale, transformOrigin: ARC_PIVOT }}
+        ref={lean.ref as React.RefObject<HTMLDivElement>}
+        onMouseMove={lean.onMouseMove}
+        onMouseLeave={lean.onMouseLeave}
+        // The lean rides alongside the scroll-driven turn rather than fighting
+        // it: Framer composes these into one transform, so the plate can be
+        // both arriving and answering the pointer at the same time.
+        style={{ rotate, scale, x: lean.x, y: lean.y, transformOrigin: ARC_PIVOT }}
         className="relative overflow-hidden rounded-xl will-change-transform"
       >
         <div className="aspect-[3/2] w-full overflow-hidden">

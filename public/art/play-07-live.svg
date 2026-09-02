@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 687" width="900" height="687" role="img">
+
+  <defs>
+    <radialGradient id="bloomplay07svg">
+      <stop offset="0" stop-color="#ff8a00" stop-opacity="0.95"/>
+      <stop offset="0.45" stop-color="#fd321c" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#fd321c" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="sweepplay07svg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8f1405"/>
+      <stop offset="0.55" stop-color="#fd321c"/>
+      <stop offset="1" stop-color="#ff8a00"/>
+    </linearGradient>
+  </defs>
+  <defs>
+    <linearGradient id="scanplay07svg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#fff" stop-opacity="0.09"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <style>
+    .breathe { transform-origin: 50% 50%; animation: breathe 7s ease-in-out infinite alternate; }
+    @keyframes breathe {
+      from { transform: scale(1.015) translate(-0.6%, 0.4%); }
+      to   { transform: scale(1.055) translate(0.6%, -0.6%); }
+    }
+    .scan { animation: scan 3.4s linear infinite; }
+    @keyframes scan {
+      from { transform: translateY(-240.4px); }
+      to   { transform: translateY(721.4px); }
+    }
+  </style>
+  <rect width="900" height="687" fill="#0a0a0b"/>
+  <g class="breathe">
+<rect width="900" height="687" fill="#111114"/><ellipse cx="521.2" cy="140.6" rx="495" ry="309.2" fill="url(#bloomplay07svg)" opacity="0.5"/><rect x="45" y="45" width="810" height="37.8" rx="8.2" fill="#fff" opacity="0.07"/><circle cx="60.1" cy="63.9" r="4.8" fill="#fff" opacity="0.2"/><circle cx="78" cy="63.9" r="4.8" fill="#fff" opacity="0.2"/><circle cx="95.8" cy="63.9" r="4.8" fill="#fff" opacity="0.2"/><rect x="45" y="96.5" width="810" height="235.2" rx="9.6" fill="url(#sweepplay07svg)" opacity="0.5"/><rect x="81" y="167.1" width="378" height="24" rx="3" fill="#fff" opacity="0.7"/><rect x="81" y="202.4" width="270" height="12.4" rx="3" fill="#fff" opacity="0.32"/><rect x="45" y="355.7" width="255" height="137.6" rx="8.2" fill="#fff" opacity="0.083"/><rect x="70.5" y="441.1" width="140.3" height="9.6" rx="2" fill="#fff" opacity="0.3"/><rect x="322.5" y="355.7" width="255" height="169.7" rx="8.2" fill="#fff" opacity="0.051"/><rect x="348" y="461" width="140.3" height="9.6" rx="2" fill="#fd321c" opacity="0.8"/><rect x="600" y="355.7" width="255" height="123.5" rx="8.2" fill="#fff" opacity="0.077"/><rect x="625.5" y="432.3" width="140.3" height="9.6" rx="2" fill="#fff" opacity="0.3"/><rect x="45" y="548.1" width="729" height="8.2" rx="2" fill="#fff" opacity="0.140"/><rect x="45" y="572.2" width="599.4" height="8.2" rx="2" fill="#fff" opacity="0.115"/><rect x="45" y="596.2" width="469.8" height="8.2" rx="2" fill="#fff" opacity="0.090"/><rect x="45" y="620.2" width="340.2" height="8.2" rx="2" fill="#fff" opacity="0.065"/>
+  </g>
+  <rect class="scan" width="900" height="206.1" fill="url(#scanplay07svg)"/>
+</svg>

@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { playgroundWall } from "@/data/site";
+import { playgroundWall, type WallTile } from "@/data/site";
+import { useReducedMotion } from "@/hooks/useMediaQuery";
+import { usePointerLean } from "@/hooks/usePointerLean";
 import { cn } from "@/lib/utils";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -50,18 +52,71 @@ export function Wall() {
               viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.75, ease: EASE, delay: (i % 4) * 0.06 }}
             >
-              <img
-                src={t.src}
-                alt={t.alt}
-                loading="lazy"
-                decoding="async"
-                className="h-full w-full object-cover transition-transform duration-700 ease-soft hover:scale-[1.04]"
-              />
+              <Plate tile={t} />
             </motion.figure>
           ))}
         </div>
       </div>
     </section>
+  );
+}
+
+/**
+ * One study: the still, and the live take that plays over it while the pointer
+ * is on it.
+ *
+ * The live version is a second SVG that carries its own CSS animation, so
+ * nothing on this page drives it — mounting it starts it and unmounting stops
+ * it, which is also why it is mounted only on hover. That keeps it off the
+ * wire until somebody asks for it and stops thirteen plates animating at once
+ * behind a page nobody is looking at.
+ *
+ * It is skipped entirely under a reduced-motion preference: this is motion for
+ * its own sake, which is exactly what that preference is about.
+ */
+function Plate({ tile }: { tile: WallTile }) {
+  const calm = useReducedMotion();
+  const [live, setLive] = useState(false);
+  const canPlay = !calm;
+  // Gentler than the project plates: these sit shoulder to shoulder, and a
+  // tile leaning as far as a half-width cover would knock into its neighbours.
+  const lean = usePointerLean(0.03);
+
+  return (
+    <motion.div
+      ref={lean.ref as React.RefObject<HTMLDivElement>}
+      style={{ x: lean.x, y: lean.y }}
+      className="h-full w-full"
+      onMouseMove={lean.onMouseMove}
+      onMouseEnter={() => canPlay && setLive(true)}
+      onMouseLeave={() => {
+        setLive(false);
+        lean.onMouseLeave();
+      }}
+    >
+      <img
+        src={tile.src}
+        alt={tile.alt}
+        loading="lazy"
+        decoding="async"
+        className={cn(
+          "h-full w-full object-cover transition-transform duration-700 ease-soft",
+          canPlay && "hover:scale-[1.04]"
+        )}
+      />
+      {live && (
+        <motion.img
+          src={tile.src.replace(/\.svg$/, "-live.svg")}
+          alt=""
+          aria-hidden="true"
+          decoding="async"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.45, ease: EASE }}
+          className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+        />
+      )}
+    </motion.div>
   );
 }
 
