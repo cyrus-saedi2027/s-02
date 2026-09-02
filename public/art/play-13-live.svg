@@ -15,17 +15,19 @@
   <defs>
     <linearGradient id="scanplay13svg" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#fff" stop-opacity="0"/>
-      <stop offset="0.5" stop-color="#fff" stop-opacity="0.09"/>
+      <stop offset="0.42" stop-color="#ff8a00" stop-opacity="0.18"/>
+      <stop offset="0.5" stop-color="#fff" stop-opacity="0.26"/>
+      <stop offset="0.58" stop-color="#fd321c" stop-opacity="0.18"/>
       <stop offset="1" stop-color="#fff" stop-opacity="0"/>
     </linearGradient>
   </defs>
   <style>
-    .breathe { transform-origin: 50% 50%; animation: breathe 7s ease-in-out infinite alternate; }
+    .breathe { transform-origin: 50% 50%; animation: breathe 4.2s ease-in-out infinite alternate; }
     @keyframes breathe {
-      from { transform: scale(1.015) translate(-0.6%, 0.4%); }
-      to   { transform: scale(1.055) translate(0.6%, -0.6%); }
+      from { transform: scale(1.02) translate(-2.2%, 1.4%) rotate(-0.6deg); }
+      to   { transform: scale(1.13) translate(2.2%, -1.8%) rotate(0.6deg); }
     }
-    .scan { animation: scan 3.4s linear infinite; }
+    .scan { animation: scan 2.4s linear infinite; }
     @keyframes scan {
       from { transform: translateY(-359.4px); }
       to   { transform: translateY(1078.4px); }

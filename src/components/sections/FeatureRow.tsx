@@ -110,7 +110,17 @@ export function FeatureRow({
         // The lean rides alongside the scroll-driven turn rather than fighting
         // it: Framer composes these into one transform, so the plate can be
         // both arriving and answering the pointer at the same time.
-        style={{ rotate, scale, x: lean.x, y: lean.y, transformOrigin: ARC_PIVOT }}
+        style={{
+          rotate,
+          scale,
+          x: lean.x,
+          y: lean.y,
+          rotateX: lean.rotateX,
+          rotateY: lean.rotateY,
+          transformOrigin: ARC_PIVOT,
+          // Without a perspective the two tilt axes flatten into a shear.
+          transformPerspective: 1100,
+        }}
         className="relative overflow-hidden rounded-xl will-change-transform"
       >
         <div className="aspect-[3/2] w-full overflow-hidden">

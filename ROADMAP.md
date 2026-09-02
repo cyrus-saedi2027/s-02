@@ -49,12 +49,15 @@ These change what the site *says*, which is where the biggest gap is.
       is not fetched until asked for and unmounting is what stops it. Not a
       frame strip: six frames of each plate would have been six times the
       artwork, and this build inlines every byte. Skipped entirely under
-      reduced motion.
+      reduced motion. Retuned after the first pass read as nothing at all:
+      91.8% of a plate's pixels now change over a second.
 
 - [x] **6. Magnetic pull on images.** `usePointerLean` gives the plates the
       lean `MagneticButton` has always had, so the work answers the pointer the
-      way the controls do. Measured: 21.6px on a project plate, 5.4px on a wall
-      tile (they sit shoulder to shoulder), 0 under reduced motion.
+      way the controls do. The shift comes with a 3D tilt, which is the half
+      you actually notice — twenty pixels across a thousand-pixel cover is a
+      change you can measure and not one you can see. Measured: 43px and 6° on
+      a project plate, 11px and 9° on a wall tile, 0 under reduced motion.
 
 - [ ] **7. Sound, off by default.** A soft click on the menu and a low sweep on
       the page change, behind a control the visitor turns on.

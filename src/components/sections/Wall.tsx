@@ -80,12 +80,18 @@ function Plate({ tile }: { tile: WallTile }) {
   const canPlay = !calm;
   // Gentler than the project plates: these sit shoulder to shoulder, and a
   // tile leaning as far as a half-width cover would knock into its neighbours.
-  const lean = usePointerLean(0.03);
+  const lean = usePointerLean(0.06, 9);
 
   return (
     <motion.div
       ref={lean.ref as React.RefObject<HTMLDivElement>}
-      style={{ x: lean.x, y: lean.y }}
+      style={{
+        x: lean.x,
+        y: lean.y,
+        rotateX: lean.rotateX,
+        rotateY: lean.rotateY,
+        transformPerspective: 700,
+      }}
       className="h-full w-full"
       onMouseMove={lean.onMouseMove}
       onMouseEnter={() => canPlay && setLive(true)}
