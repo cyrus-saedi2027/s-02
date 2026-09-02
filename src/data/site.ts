@@ -47,6 +47,28 @@ export type Project = {
   /** Wide cover used by the feature rows. */
   cover: string;
   blurb: string;
+
+  /* --- the case study at /projects/<slug> --- */
+
+  /** Last segment of the project's own URL. */
+  slug: string;
+  client: string;
+  /** What I actually did, as against what the project was. */
+  role: string;
+  duration: string;
+  /** The one line the project page opens on. */
+  lede: string;
+  /** What was wrong before the work started. */
+  problem: string;
+  /**
+   * The work itself, in two or three moves. Each carries a plate, which
+   * alternates side down the page the way the index rows do.
+   */
+  chapters: { title: string; body: string; art: string }[];
+  /** Three figures. `value` counts up from zero when it comes into view. */
+  metrics: { value: number; suffix?: string; label: string }[];
+  /** What changed, once it shipped. */
+  outcome: string;
 };
 
 export const projects: Project[] = [
@@ -58,6 +80,37 @@ export const projects: Project[] = [
     year: "2025",
     art: "/art/work-01.svg",
     blurb: "A workshop tooling suite rebuilt around one uncluttered canvas.",
+    slug: "halcyon",
+    client: "Halcyon Instruments",
+    role: "Product design, design system, front-end",
+    duration: "14 weeks",
+    lede: "Eleven screens became one canvas.",
+    problem:
+      "Halcyon's technicians ran diagnostics across eleven separate screens, and every one of them had been added by a different team in a different year. The work itself was fast; finding where to do it was not. Support saw the same three questions every week, and all three were really the same question — where is that setting now.",
+    chapters: [
+      {
+        title: "Watching the work, not the software",
+        body: "Two weeks in the workshop before a pixel moved. Technicians were doing the same six tasks over and over, and every one of them crossed at least four screens. I mapped the crossings rather than the screens, which is what showed the shape: the software had been organised by which team built it, not by what anybody did with it.",
+        art: "/art/work-01.svg",
+      },
+      {
+        title: "One canvas, six tools",
+        body: "Everything collapsed onto a single canvas with the instrument at the centre and the six tasks as tools around it. Nothing was deleted — the settings all survived, they just stopped being destinations. The rarely-used ninety percent moved behind one panel that opens where the cursor is.",
+        art: "/art/panel-design.svg",
+      },
+      {
+        title: "A system the team can extend",
+        body: "Twenty-eight components, each documented with the decision behind it rather than only its props. The point was that the next person to add a tool would not need me: eight months on, three tools have shipped that I had nothing to do with, and they look like they belong.",
+        art: "/art/panel-development.svg",
+      },
+    ],
+    metrics: [
+      { value: 11, suffix: "→1", label: "Screens, collapsed to one canvas" },
+      { value: 62, suffix: "%", label: "Faster to complete a full diagnostic" },
+      { value: 3, suffix: "×", label: "Drop in support tickets about navigation" },
+    ],
+    outcome:
+      "A full diagnostic that used to take just under seven minutes now takes two and a half. The three questions support kept fielding have not been asked since the second month. The design system has outlived my involvement, which is the part I am actually proud of.",
   },
   {
     index: "/ 02",
@@ -67,6 +120,32 @@ export const projects: Project[] = [
     year: "2024",
     art: "/art/work-02.svg",
     blurb: "An identity system for a research lab, from mark to motion kit.",
+    slug: "vantable",
+    client: "Vantable Research",
+    role: "Identity, illustration, motion, web",
+    duration: "9 weeks",
+    lede: "A lab that looked like nine different labs.",
+    problem:
+      "Vantable published good work under a name nobody could picture. Every paper, deck and poster had been set by whoever made it, so the same institute appeared in nine typefaces and four blues. Recruiters could not tell two of their groups apart, and neither could their funders.",
+    chapters: [
+      {
+        title: "A mark built from their own data",
+        body: "The logo is a plot. Vantable's founding paper turned on one particular curve, and the mark is that curve, redrawn at a weight that survives being embroidered on a fleece. It means something to the forty people inside and reads as a confident abstract shape to everyone else, which is the only honest way to make a mark carry meaning.",
+        art: "/art/work-02.svg",
+      },
+      {
+        title: "Illustration instead of stock",
+        body: "Research pages need pictures and there are no photographs of most of this work. A drawing system — a fixed palette, one line weight, one construction grid — lets any group make its own diagrams without them drifting apart. Sixty-odd have been drawn since, four by me.",
+        art: "/art/panel-strategy.svg",
+      },
+    ],
+    metrics: [
+      { value: 9, suffix: "→1", label: "Typefaces in use across the institute" },
+      { value: 40, label: "People onboarded to the kit" },
+      { value: 60, suffix: "+", label: "Diagrams drawn in the system since" },
+    ],
+    outcome:
+      "One institute that reads as one institute. The kit went out with a two-page guide rather than a forty-page manual, which is why people actually use it — the constraint that made that possible was refusing to add a rule I could not justify in a sentence.",
   },
   {
     index: "/ 03",
@@ -76,6 +155,32 @@ export const projects: Project[] = [
     year: "2024",
     art: "/art/work-03.svg",
     blurb: "Editorial commerce for a studio that sells very few, very good objects.",
+    slug: "ottermade",
+    client: "Ottermade",
+    role: "Brand, design, front-end",
+    duration: "11 weeks",
+    lede: "Nine objects a year, sold like ninety thousand.",
+    problem:
+      "Ottermade makes nine objects a year and was selling them through a template built for a catalogue of thousands. Filters nobody needed, a search nobody used, related-products rails pointing at the only other four things in the shop. The work was quiet and considered and the shop around it was shouting.",
+    chapters: [
+      {
+        title: "Fewer things, more room",
+        body: "The whole shop is one scroll. Each object gets a full screen, photographed the way the studio photographs it, with the price set at the same size as the body copy rather than in a badge. Nothing competes with anything else because there is nothing else on screen.",
+        art: "/art/work-03.svg",
+      },
+      {
+        title: "The making is the marketing",
+        body: "Every object page carries the process behind it — the material, the failed version, the person who made it. That is what the studio talks about anyway; putting it in the buying flow rather than in a separate journal is what changed the numbers.",
+        art: "/art/panel-production.svg",
+      },
+    ],
+    metrics: [
+      { value: 34, suffix: "%", label: "Rise in conversion, first quarter" },
+      { value: 2, suffix: "×", label: "Time spent on an object page" },
+      { value: 0, label: "Filters, searches or related-product rails" },
+    ],
+    outcome:
+      "Conversion up a third in the first quarter, and — the number the studio cared about more — the objects that used to sit unsold now sell at the same rate as the popular ones. Giving each of them a whole screen turned out to be the entire trick.",
   },
   {
     index: "/ 04",
@@ -85,6 +190,37 @@ export const projects: Project[] = [
     year: "2023",
     art: "/art/work-04.svg",
     blurb: "A scheduling product reduced to the three screens people actually use.",
+    slug: "persimmon",
+    client: "Persimmon",
+    role: "Product design, brand",
+    duration: "16 weeks",
+    lede: "Forty features, three of them used.",
+    problem:
+      "Persimmon had shipped forty features in two years and churn was climbing. The analytics were blunt about it: three screens carried ninety-four percent of all sessions and the other thirty-seven features were being maintained for almost nobody. Every one of them still had to be understood before a new user could get to the three that mattered.",
+    chapters: [
+      {
+        title: "Reading the analytics honestly",
+        body: "The uncomfortable part was not finding the number. It was that four of the unused features had been someone's whole quarter. I wrote the case for cutting them around what each one cost to keep rather than around whether it was any good, which is the argument that survives a room.",
+        art: "/art/work-04.svg",
+      },
+      {
+        title: "Three screens, done properly",
+        body: "Book, reschedule, and see the week. Every hour that came out of the other thirty-seven went into these: keyboard-first, sensible when two people book the same slot, and legible on the phone screens people actually use rather than the one in the mock.",
+        art: "/art/panel-design.svg",
+      },
+      {
+        title: "A brand that stopped apologising",
+        body: "The old identity hedged — a soft blue that could have been any of two hundred scheduling tools. The new one commits to one warm red and a typeface with an opinion, and it reads as a product made by people rather than by a category.",
+        art: "/art/panel-strategy.svg",
+      },
+    ],
+    metrics: [
+      { value: 37, label: "Features removed" },
+      { value: 41, suffix: "%", label: "Fall in first-month churn" },
+      { value: 8, suffix: "s", label: "Median time to book, down from 46" },
+    ],
+    outcome:
+      "Churn in the first month fell by two fifths and has stayed there. Booking went from forty-six seconds to eight. Nothing in the three screens is clever — the work was in getting permission to delete the other thirty-seven.",
   },
   {
     index: "/ 05",
@@ -94,6 +230,32 @@ export const projects: Project[] = [
     year: "2023",
     art: "/art/work-01.svg",
     blurb: "A seasonal kitchen brought online without losing the handwriting.",
+    slug: "tallowfield",
+    client: "Tallowfield Kitchen",
+    role: "Brand, design, front-end",
+    duration: "7 weeks",
+    lede: "The menu changes daily. So does the site.",
+    problem:
+      "Tallowfield writes its menu each morning on a board by the door, in the chef's handwriting, and it changes with what the growers bring. Their website showed a PDF from eleven months earlier. Every booking started with a phone call asking what was on.",
+    chapters: [
+      {
+        title: "Keeping the hand in it",
+        body: "The board is the brand. A typeface drawn from the chef's own lettering carries the headings, and the daily menu is set in it too — typed into a phone in the morning, on the site before service. It reads as the same hand because it is.",
+        art: "/art/panel-production.svg",
+      },
+      {
+        title: "Fast on a bad connection",
+        body: "Half the traffic arrives from a phone on the street outside, deciding whether to come in. The whole site is under 90 kB and the menu is the first thing painted. Nothing loads that is not on screen.",
+        art: "/art/work-01.svg",
+      },
+    ],
+    metrics: [
+      { value: 90, suffix: "kB", label: "Total page weight" },
+      { value: 78, suffix: "%", label: "Fewer 'what's on today' calls" },
+      { value: 4, label: "Minutes to publish the day's menu" },
+    ],
+    outcome:
+      "The calls asking what is on have all but stopped, and the kitchen publishes the menu itself in four minutes without opening a laptop. The brand survived the move online, which was the only thing they were actually worried about.",
   },
   {
     index: "/ 06",
@@ -103,6 +265,32 @@ export const projects: Project[] = [
     year: "2023",
     art: "/art/work-02.svg",
     blurb: "A documentation site that loads in a blink on a bad connection.",
+    slug: "mesa",
+    client: "Mesa",
+    role: "Front-end, performance",
+    duration: "6 weeks",
+    lede: "Documentation that loads before you finish blinking.",
+    problem:
+      "Mesa's docs took eleven seconds to become readable on a mid-range Android phone on 3G, and a good share of their users are on exactly that. The site shipped 2.4 MB of JavaScript to render text. Search worked, once it had loaded, which was after most people had left.",
+    chapters: [
+      {
+        title: "Text first, everything else after",
+        body: "Every page is server-rendered HTML that reads without a single byte of JavaScript. The interactive parts — search, the version switcher, the code playground — load after the text is already on screen, and only when they are reachable.",
+        art: "/art/work-02.svg",
+      },
+      {
+        title: "Search that fits in a page",
+        body: "The old search shipped a 900 kB index. The new one is a 34 kB prefix trie built at deploy time, and it answers in under 5 ms on the phone I tested on rather than the laptop I wrote it on.",
+        art: "/art/panel-development.svg",
+      },
+    ],
+    metrics: [
+      { value: 11, suffix: "→1.2s", label: "Time to readable text on 3G" },
+      { value: 96, suffix: "%", label: "Less JavaScript shipped" },
+      { value: 34, suffix: "kB", label: "Search index, down from 900" },
+    ],
+    outcome:
+      "Eleven seconds to one and a bit, and the search that used to be the heaviest thing on the page is now smaller than one of its old icons. None of this needed a new framework — it needed deciding what was allowed to block the text.",
   },
   {
     index: "/ 07",
@@ -112,6 +300,32 @@ export const projects: Project[] = [
     year: "2022",
     art: "/art/work-03.svg",
     blurb: "Packaging for a small-batch perfumer, built around one folded form.",
+    slug: "lune",
+    client: "Lune Parfums",
+    role: "Brand, packaging, art direction",
+    duration: "10 weeks",
+    lede: "One fold, six products, no glue.",
+    problem:
+      "Lune had six products in six different boxes from four suppliers, and the unit cost was eating a startup's margin. They also could not say, out loud, what held the range together — which is a branding problem wearing a packaging problem's clothes.",
+    chapters: [
+      {
+        title: "One fold, six sizes",
+        body: "A single die-line, scaled six ways, folded from one sheet with no glue and no insert. Same tooling, same supplier, same gesture when you open it. The saving paid for the paper stock they actually wanted.",
+        art: "/art/work-03.svg",
+      },
+      {
+        title: "Print you can only get on paper",
+        body: "The range is told apart by a blind deboss that catches light rather than by colour, so it reads in a dim shop and photographs badly on purpose — you have to hold one. The decision was as much about where they sell as about how it looks.",
+        art: "/art/panel-strategy.svg",
+      },
+    ],
+    metrics: [
+      { value: 6, suffix: "→1", label: "Die-lines across the range" },
+      { value: 44, suffix: "%", label: "Lower packaging cost per unit" },
+      { value: 0, label: "Glue, inserts or plastic" },
+    ],
+    outcome:
+      "Packaging cost per unit down by nearly half, one supplier instead of four, and a range that finally looks like a range. The deboss has since become the thing people photograph, despite it being the part designed not to photograph well.",
   },
 ];
 

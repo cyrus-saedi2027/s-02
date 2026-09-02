@@ -18,6 +18,7 @@ import AboutPage from "./pages/AboutPage";
 import ProjectsPage from "./pages/ProjectsPage";
 import PlaygroundPage from "./pages/PlaygroundPage";
 import ContactPage from "./pages/ContactPage";
+import ProjectPage from "./pages/ProjectPage";
 
 import { useSmoothScroll } from "./hooks/useSmoothScroll";
 import { withPageTransition } from "./lib/pageTransition";
@@ -31,6 +32,32 @@ const CURSOR_VARIANT: CursorVariant = "ring";
 
 /** Paths the in-page router owns. Anything else is left to the browser. */
 const ROUTES = ["/", "/about", "/projects", "/playground", "/contact"];
+
+/** Every project has its own page under /projects, so the list is not exhaustive. */
+const PROJECT_PATH = /^\/projects\/([a-z0-9-]+)$/;
+const isSiteRoute = (path: string) =>
+  ROUTES.includes(path) || PROJECT_PATH.test(path);
+
+/**
+ * The plate on this page for `slug`, if the visitor can see it.
+ *
+ * Lending it `view-transition-name: project-cover` makes it morph into the
+ * hero of the project page rather than being wiped away with everything else —
+ * the same picture, carried across the change of page.
+ *
+ * Only when it is on screen. A name given to a plate the visitor cannot see
+ * still animates: the browser slides it in from wherever it sits in the
+ * document, which from three screens down reads as a long unexplained swoop.
+ * The typographic works list links to the same projects from far above their
+ * plates, so this case is reached in normal use, not in theory.
+ */
+function visibleCover(slug: string) {
+  const el = document.querySelector<HTMLElement>(`[data-project-cover="${slug}"]`);
+  if (!el) return null;
+  const r = el.getBoundingClientRect();
+  const seen = r.bottom > 0 && r.top < window.innerHeight;
+  return seen ? el : null;
+}
 
 /**
  * Routes live in the hash.
@@ -129,7 +156,7 @@ function Shell() {
       const url = new URL(link.href, window.location.href);
       if (url.origin !== window.location.origin) return;
       const path = url.pathname.replace(/\/+$/, "") || "/";
-      if (!ROUTES.includes(path)) return;
+      if (!isSiteRoute(path)) return;
 
       e.preventDefault();
       setMenuOpen(false);
@@ -140,10 +167,28 @@ function Shell() {
         return;
       }
 
-      withPageTransition(() => {
-        // flushSync so the new page is committed before the API snapshots it.
-        flushSync(() => navigate(path + url.hash));
-      });
+      // Going to a project page, the plate that was clicked travels with you.
+      const cover = visibleCover(path.match(PROJECT_PATH)?.[1] ?? "");
+      if (cover) cover.style.viewTransitionName = "project-cover";
+
+      withPageTransition(
+        () => {
+          // flushSync so the new page is committed before the API snapshots it.
+          flushSync(() => navigate(path + url.hash));
+          // And put it at the top here rather than in the effect below, which
+          // does not run until after the snapshot. Left to the effect, the new
+          // page was captured still sitting at the old page's offset: the wipe
+          // covered that, but the travelling cover did not — it was measured
+          // against a hero that had not reached its resting place, so the
+          // plate stopped short of where it was going.
+          if (!url.hash) window.scrollTo(0, 0);
+        },
+        () => {
+          // Hand the name back: two elements wearing it at once is invalid and
+          // the browser drops the transition entirely.
+          if (cover) cover.style.viewTransitionName = "";
+        }
+      );
     };
 
     document.addEventListener("click", onClick);
@@ -193,6 +238,7 @@ function Shell() {
           <Route path="/" element={<Home ready={ready} onBook={openBooking} />} />
           <Route path="/about" element={<AboutPage onBook={openBooking} />} />
           <Route path="/projects" element={<ProjectsPage onBook={openBooking} />} />
+          <Route path="/projects/:slug" element={<ProjectPage onBook={openBooking} />} />
           <Route path="/playground" element={<PlaygroundPage onBook={openBooking} />} />
           <Route path="/contact" element={<ContactPage onBook={openBooking} />} />
           {/* Anything unrecognised falls back to the home page. */}

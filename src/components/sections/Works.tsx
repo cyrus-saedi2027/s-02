@@ -128,7 +128,7 @@ function ProjectRow({
       className="group relative border-b border-hair"
     >
       <a
-        href="/projects"
+        href={`/projects/${project.slug}`}
         data-cursor={desktop ? "view" : undefined}
         className="relative block px-1 py-8 md:py-10 lg:py-12"
       >

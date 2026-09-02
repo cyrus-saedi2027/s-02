@@ -178,6 +178,25 @@
   );
 }
 
+/* The cover that travels between the projects index and a project page.
+   Naming an element lifts it out of the root snapshot, so it moves on its own
+   over the wipe instead of being carried off with the rest of the page. It is
+   the same picture at two sizes, so the pair is held rather than cross-faded —
+   fading one into the other only muddies it — and the box does the work. Its
+   own curve is shorter than the wipe's second: the plate should arrive and
+   settle while the new page is still coming up behind it. */
+::view-transition-group(project-cover) {
+  animation-duration: 0.72s;
+  animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+::view-transition-old(project-cover),
+::view-transition-new(project-cover) {
+  animation-duration: 0.72s;
+  animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+  mix-blend-mode: normal;
+}
+
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-group(*),
   ::view-transition-old(*),

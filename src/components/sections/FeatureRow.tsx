@@ -40,14 +40,11 @@ export function FeatureRow({
   project,
   index,
   flipped,
-  href = "/projects",
   headingLevel = 3,
 }: {
   project: Project;
   index: number;
   flipped: boolean;
-  /** Where the row's button goes. The index has nowhere deeper to send you. */
-  href?: string;
   /**
    * The home page runs these under an "In Detail" h2, so h3 is right there.
    * The index has only its masthead above them, where an h3 would skip a
@@ -102,6 +99,9 @@ export function FeatureRow({
     >
       {/* Cover */}
       <motion.div
+        // The handle the click handler finds this plate by, so it can lend it
+        // its view-transition-name on the way into the project page.
+        data-project-cover={project.slug}
         style={{ rotate, scale, transformOrigin: ARC_PIVOT }}
         className="relative overflow-hidden rounded-xl will-change-transform"
       >
@@ -137,7 +137,11 @@ export function FeatureRow({
           {project.blurb}
         </p>
         <div className="mt-8">
-          <MagneticButton label="View project" href={href} variant="accent" />
+          <MagneticButton
+            label="View project"
+            href={`/projects/${project.slug}`}
+            variant="accent"
+          />
         </div>
       </motion.div>
     </div>
@@ -154,11 +158,9 @@ export function FeatureRow({
  */
 export function FeatureRows({
   items,
-  href,
   headingLevel,
 }: {
   items: Project[];
-  href?: string;
   headingLevel?: 2 | 3;
 }) {
   return (
@@ -172,7 +174,6 @@ export function FeatureRows({
             project={p}
             index={i}
             flipped={i % 2 === 1}
-            href={href}
             headingLevel={headingLevel}
           />
         ))}

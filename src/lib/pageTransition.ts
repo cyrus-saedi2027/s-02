@@ -41,10 +41,15 @@ type StartViewTransition = (cb: () => void | Promise<void>) => {
  * `flushSync`-wrapped state update: the API captures the "after" state as soon
  * as the callback resolves, so a change still sitting in React's queue would
  * be captured as the old page and nothing would appear to move.
+ *
+ * `done` runs once the transition has finished or failed. It exists for the
+ * shared-element handoff: a `view-transition-name` has to be unique in the
+ * document, so whichever plate borrows one has to give it back.
  */
-export function withPageTransition(commit: () => void) {
+export function withPageTransition(commit: () => void, done?: () => void) {
   if (!canAnimate()) {
     commit();
+    done?.();
     return;
   }
 
@@ -59,5 +64,6 @@ export function withPageTransition(commit: () => void) {
     .catch(() => {})
     .finally(() => {
       delete document.documentElement.dataset.pageTransition;
+      done?.();
     });
 }

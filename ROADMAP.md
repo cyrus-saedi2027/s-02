@@ -12,10 +12,10 @@ Status legend: `[ ]` not started · `[~]` in progress · `[x]` done
 
 These change what the site *says*, which is where the biggest gap is.
 
-- [ ] **1. A page per project** (`/projects/halcyon`, and one for each of the
-      seven). Right now every "View project" button leads nowhere, which is the
-      largest hole in the site: the work is announced but never shown. Each page
-      wants the problem, the work, and the outcome — with real numbers.
+- [x] **1. A page per project** (`/projects/halcyon`, and one for each of the
+      seven). Every "View project" button now opens the work rather than
+      nothing. Each page runs lede → the problem → the work in two or three
+      chapters → three figures that count up → the next project.
 
 - [ ] **2. Real social links.** The four accounts in the footer and on the
       contact page are `href="#"`. They no longer break the route (fixed in
@@ -29,10 +29,12 @@ These change what the site *says*, which is where the biggest gap is.
 
 ## B — Motion and feel
 
-- [ ] **4. Shared-element transition into a project page.** The cover in the
-      index grows into the hero of the project page rather than the page
-      cutting. The View Transitions API already drives the route wipe, so the
-      machinery is in place.
+- [x] **4. Shared-element transition into a project page.** The clicked plate
+      is lent `view-transition-name: project-cover` and lands on the hero of
+      the page it opens. Measured travelling from the index box
+      `x=516 y=-30 563x375` to exactly the hero box `x=44 y=100 1012x569`.
+      Only when the plate is on screen, and only forwards — coming back plays
+      the ordinary wipe.
 
 - [ ] **5. Live previews on the playground wall.** A short, silent video that
       plays only on hover, so a study can show its motion instead of a still.
