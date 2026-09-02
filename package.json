@@ -5,11 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "node scripts/generate-seo.mjs && vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
-    "build:standalone": "SINGLE_FILE=1 vite build && node scripts/build-standalone.mjs",
+    "build:standalone": "node scripts/generate-seo.mjs && SINGLE_FILE=1 vite build && node scripts/build-standalone.mjs",
     "test:schedule": "esbuild --bundle --platform=node --format=esm --outfile=node_modules/.cache/schedule.test.mjs scripts/schedule.test.ts && node node_modules/.cache/schedule.test.mjs"
   },
   "dependencies": {

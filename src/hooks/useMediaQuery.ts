@@ -1,4 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
+import {
+  motionReducedByChoice,
+  subscribeMotionPreference,
+} from "@/lib/motionPreference";
 
 export function useMediaQuery(query: string) {
   const [matches, setMatches] = useState(() =>
@@ -16,5 +20,19 @@ export function useMediaQuery(query: string) {
   return matches;
 }
 
-export const useReducedMotion = () =>
-  useMediaQuery("(prefers-reduced-motion: reduce)");
+/**
+ * Whether to hold still: the system preference, or the switch in the page.
+ *
+ * Everything that moves on this site reads this one hook, so the in-page
+ * control reaches all of it — the scroll-linked plates, the live previews on
+ * the wall, the pointer lean — without any of them knowing the switch exists.
+ */
+export function useReducedMotion() {
+  const system = useMediaQuery("(prefers-reduced-motion: reduce)");
+  const chosen = useSyncExternalStore(
+    subscribeMotionPreference,
+    motionReducedByChoice,
+    () => false
+  );
+  return system || chosen;
+}

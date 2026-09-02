@@ -11,6 +11,7 @@ import { Header } from "./components/Header";
 import { MenuOverlay } from "./components/MenuOverlay";
 import { Footer } from "./components/sections/Footer";
 import { ClosingMark } from "./components/sections/ClosingMark";
+import { DocumentHead } from "./components/DocumentHead";
 
 import Home from "./pages/Home";
 
@@ -50,6 +51,7 @@ const ContactPage = lazy(load["/contact"]);
 const ProjectPage = lazy(load.project);
 
 import { useSmoothScroll } from "./hooks/useSmoothScroll";
+import { useReducedMotion } from "./hooks/useMediaQuery";
 import { withPageTransition } from "./lib/pageTransition";
 
 /**
@@ -113,12 +115,23 @@ export default function App() {
     // preference set. `reducedMotion="user"` hands that decision to the OS for
     // every motion component at once, keeping opacity fades and dropping the
     // transforms that actually cause trouble.
-    <MotionConfig reducedMotion="user">
-      <Router>
+    <Router>
+      <MotionGate>
         <Shell />
-      </Router>
-    </MotionConfig>
+      </MotionGate>
+    </Router>
   );
+}
+
+/**
+ * Framer's own reduced-motion handling reads the system preference directly,
+ * so it has to be told about the switch in the page: "always" forces it,
+ * "user" leaves it to the OS. Inside the router, because the hook it reads
+ * subscribes to a store and wants to be under React's tree.
+ */
+function MotionGate({ children }: { children: React.ReactNode }) {
+  const calm = useReducedMotion();
+  return <MotionConfig reducedMotion={calm ? "always" : "user"}>{children}</MotionConfig>;
 }
 
 function Shell() {
@@ -258,6 +271,7 @@ function Shell() {
 
   return (
     <div id="top" className="grain relative min-h-screen text-paper">
+      <DocumentHead />
       <Preloader onDone={() => setReady(true)} />
       <Cursor variant={CURSOR_VARIANT} />
 

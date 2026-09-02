@@ -25,8 +25,8 @@ export default {
         surfaceUp: "#111111",
       },
       fontFamily: {
-        display: ['Poppins', 'system-ui', 'sans-serif'],
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['Poppins', 'Poppins Fallback', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'Inter Fallback', 'system-ui', 'sans-serif'],
       },
       /* Scale lifted from the reference: 12→250px */
       fontSize: {

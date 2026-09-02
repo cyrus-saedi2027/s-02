@@ -159,3 +159,128 @@
   src: url('/fonts/poppins-900-latin.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
+
+/*
+ * Metric-matched fallbacks.
+ *
+ * Both webfonts load with `font-display: swap`, so text is painted in a system
+ * face first and re-laid out when the real one lands. Poppins is around 7%
+ * wider than that fallback and a good deal taller in the box, so the swap
+ * moved everything below it. On /about that single reflow was 0.2 of a 0.22
+ * lab CLS, the rest of the page contributing almost nothing.
+ *
+ * No visitor ever saw it — every shift lands behind the preloader, which does
+ * not clear for about 3.4 seconds, and visible CLS measured 0 on all five
+ * routes. Field tooling still reports it, and on a slow connection the curtain
+ * could lift first, so the swap is worth making invisible rather than merely
+ * hidden.
+ *
+ * Each face below is the local system sans, rescaled so its metrics match the
+ * webfont it stands in for. `size-adjust` is the measured width ratio;
+ * ascent and descent are the real font's metrics divided by that ratio,
+ * because size-adjust scales the overrides too. Measured per weight, since the
+ * ratio is not constant across them.
+ *
+ * If none of the named local faces exist the declaration is simply unusable
+ * and the stack falls through to plain `sans-serif` — exactly what happened
+ * before, so this can only help.
+ */
+
+@font-face {
+  font-family: 'Poppins Fallback';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Arial'), local('Helvetica'), local('Liberation Sans'), local('DejaVu Sans');
+  size-adjust: 106.97%;
+  ascent-override: 98.16%;
+  descent-override: 32.72%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Poppins Fallback';
+  font-style: normal;
+  font-weight: 500;
+  src: local('Arial'), local('Helvetica'), local('Liberation Sans'), local('DejaVu Sans');
+  size-adjust: 108.58%;
+  ascent-override: 96.70%;
+  descent-override: 32.23%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Poppins Fallback';
+  font-style: normal;
+  font-weight: 600;
+  src: local('Arial'), local('Helvetica'), local('Liberation Sans'), local('DejaVu Sans');
+  size-adjust: 104.02%;
+  ascent-override: 100.94%;
+  descent-override: 33.65%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Poppins Fallback';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Arial'), local('Helvetica'), local('Liberation Sans'), local('DejaVu Sans');
+  size-adjust: 105.45%;
+  ascent-override: 99.57%;
+  descent-override: 33.19%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Poppins Fallback';
+  font-style: normal;
+  font-weight: 800;
+  src: local('Arial'), local('Helvetica'), local('Liberation Sans'), local('DejaVu Sans');
+  size-adjust: 106.66%;
+  ascent-override: 98.44%;
+  descent-override: 32.81%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Inter Fallback';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Arial'), local('Helvetica'), local('Liberation Sans'), local('DejaVu Sans');
+  size-adjust: 105.18%;
+  ascent-override: 92.22%;
+  descent-override: 22.82%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Inter Fallback';
+  font-style: normal;
+  font-weight: 500;
+  src: local('Arial'), local('Helvetica'), local('Liberation Sans'), local('DejaVu Sans');
+  size-adjust: 106.34%;
+  ascent-override: 91.22%;
+  descent-override: 22.57%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Inter Fallback';
+  font-style: normal;
+  font-weight: 600;
+  src: local('Arial'), local('Helvetica'), local('Liberation Sans'), local('DejaVu Sans');
+  size-adjust: 101.75%;
+  ascent-override: 95.33%;
+  descent-override: 23.59%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Inter Fallback';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Arial'), local('Helvetica'), local('Liberation Sans'), local('DejaVu Sans');
+  size-adjust: 102.85%;
+  ascent-override: 94.31%;
+  descent-override: 23.33%;
+  line-gap-override: 0%;
+}

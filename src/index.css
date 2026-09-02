@@ -272,6 +272,27 @@ html[data-page-transition="true"] .site-cursor {
   }
 }
 
+/* A visitor asking for more contrast is asking to be able to read this.
+   The palette leans hard on low-opacity white — 0.56 for body copy, 0.14 for
+   rules — which is the right register for the design and not enough contrast
+   for everyone. These lift the dimmed tiers and the hairlines rather than
+   flattening the whole thing to white on black, so the page keeps its shape.
+   `!important` because they are overriding utilities that are themselves the
+   final word; an accessibility preference outranks a design token. */
+@media (prefers-contrast: more) {
+  .text-dim { color: rgba(255, 255, 255, 0.88) !important; }
+  .text-dimmer { color: rgba(255, 255, 255, 0.76) !important; }
+  .border-hair { border-color: rgba(255, 255, 255, 0.42) !important; }
+  .border-hairStrong { border-color: rgba(255, 255, 255, 0.68) !important; }
+  .text-white\/55, .text-white\/80 { color: rgba(255, 255, 255, 0.95) !important; }
+  .placeholder\:text-white\/40::placeholder { color: rgba(255, 255, 255, 0.7) !important; }
+  /* The focus ring has to survive it too. */
+  :focus-visible {
+    outline: 3px solid #fff !important;
+    outline-offset: 3px !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -281,4 +302,18 @@ html[data-page-transition="true"] .site-cursor {
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* The same again for the switch in the page. It cannot be folded into the
+   media query above — a media query answers the operating system and nothing
+   else — and without it the marquees, which are CSS animations rather than
+   Framer ones, kept running after the switch was thrown. */
+html[data-motion="reduced"],
+html[data-motion="reduced"] *,
+html[data-motion="reduced"] *::before,
+html[data-motion="reduced"] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
 }

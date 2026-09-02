@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useReducedMotion } from "./useMediaQuery";
 
 /**
  * Lerp-based smooth scrolling, in the spirit of the reference site's inertial feel.
@@ -6,9 +7,13 @@ import { useEffect } from "react";
  * IntersectionObserver and anchor links all keep working normally.
  */
 export function useSmoothScroll(enabled = true) {
+  // Reads the switch in the page as well as the system preference, so turning
+  // motion off there gives back the browser's own scrolling rather than
+  // leaving the one piece of inertia the switch could not reach.
+  const calm = useReducedMotion();
+
   useEffect(() => {
-    if (!enabled) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!enabled || calm) return;
     // Touch devices already have momentum scrolling; hijacking it feels worse.
     if (window.matchMedia("(pointer: coarse)").matches) return;
 
@@ -81,5 +86,5 @@ export function useSmoothScroll(enabled = true) {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", measure);
     };
-  }, [enabled]);
+  }, [enabled, calm]);
 }

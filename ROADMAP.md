@@ -75,17 +75,31 @@ These change what the site *says*, which is where the biggest gap is.
       all back into one chunk for the standalone build, which has no server to
       fetch from.
 
-- [ ] **9. Font metric overrides** (`size-adjust` on a fallback face). Lab CLS
-      on `/about` is 0.22, almost all of it one font swap. *No visitor sees
-      it* — every shift lands behind the preloader, which clears at ~3.4s, and
-      visible CLS measured 0 on all five routes — but field tooling reports it.
+- [x] **9. Font metric overrides.** Nine fallback faces, one per weight, each
+      the local system sans rescaled so its metrics match the webfont it stands
+      in for — `size-adjust` from the measured width ratio, ascent and descent
+      divided by it because size-adjust scales the overrides too. `/about` lab
+      CLS went 0.217 to 0.012, worst single shift 0.2027 to 0.0048. Every route
+      is now well inside the 0.1 "good" threshold.
 
-- [ ] **10. `prefers-contrast`, and a motion control in the page.** Reduced
-      motion is honoured from the OS as of `b61fa37`; a switch in the page
-      serves the visitor who has not set a system preference.
+- [x] **10. `prefers-contrast`, and a motion control in the page.** The dimmed
+      tiers and hairlines lift under `prefers-contrast: more` (0.56 to 0.88 for
+      body copy, 0.14 to 0.42 for rules) and the focus ring goes to a 3px white
+      outline. A switch in the footer asks the site to hold still — one-way, so
+      it cannot argue with a system preference that already says reduce, and it
+      hides itself entirely in that case. Measured: 9 elements moving to 0, and
+      the choice survives a reload.
 
-- [ ] **11. `sitemap.xml`, `robots.txt`, JSON-LD.** Nothing about this site is
-      currently legible to a search engine beyond the one meta description.
+- [x] **11. `sitemap.xml`, `robots.txt`, JSON-LD.** All three, plus a title,
+      description, canonical and Open Graph pair per route. The sitemap is
+      generated from the project list at build time so it cannot drift.
+      **One thing to be straight about:** routes live in the hash, and a
+      fragment never reaches a server — a crawler asking for `/#/about` is
+      handed `/`. None of this makes the pages indexable on its own. What it
+      does buy is real (tabs, history, bookmarks, link cards), and it is
+      already correct the day the site sits behind a host with a rewrite.
+      Switching to `BrowserRouter` is what would finish the job, and it would
+      cost the single-file build.
 
 ## D — Bolder
 

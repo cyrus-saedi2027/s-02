@@ -1,0 +1,5 @@
+# https://zaylamonroe.com
+User-agent: *
+Allow: /
+
+Sitemap: https://zaylamonroe.com/sitemap.xml

@@ -3,6 +3,7 @@ import { Reveal } from "../ui/Reveal";
 import { HoverStaggerLabel } from "../ui/AnimatedText";
 import { SocialLink } from "../ui/SocialLink";
 import { SoundToggle } from "../ui/SoundToggle";
+import { MotionToggle } from "../ui/MotionToggle";
 import { identity, navLinks, socials } from "@/data/site";
 
 export function Footer() {
@@ -82,7 +83,10 @@ export function Footer() {
             <span className="h-1.5 w-1.5 rounded-full bg-accent" />
             Designed &amp; built in Amsterdam
           </span>
-          <SoundToggle />
+          <span className="flex flex-wrap items-center gap-x-6 gap-y-3">
+            <SoundToggle />
+            <MotionToggle />
+          </span>
           <a href="#top" className="transition-colors hover:text-paper">
             Back to top ↑
           </a>
