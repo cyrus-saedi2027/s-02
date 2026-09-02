@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { identity, projects } from "@/data/site";
+import { identity, notes, projects } from "@/data/site";
 
 const SITE = (import.meta.env.VITE_SITE_URL ?? "https://zaylamonroe.com").replace(/\/+$/, "");
 
@@ -22,6 +22,10 @@ const PAGES: Record<string, Omit<Meta, "path">> = {
   "/playground": {
     title: `Playground — ${identity.name}`,
     description: `Off-cuts, studies, and things made for their own sake.`,
+  },
+  "/writing": {
+    title: `Writing — ${identity.name}`,
+    description: `Short technical notes: what broke, what it turned out to be, and what it is worth remembering.`,
   },
   "/contact": {
     title: `Contact — ${identity.name}`,
@@ -51,18 +55,32 @@ export function DocumentHead() {
   // Read from the path rather than useParams: this sits above <Routes>, where
   // no route has matched and params are empty. One regex keeps it there, out
   // of the page components, so every route is described in one place.
-  const slug = pathname.match(/^\/projects\/([a-z0-9-]+)$/)?.[1];
+  const slug = pathname.match(/^\/(?:projects|writing)\/([a-z0-9-]+)$/)?.[1];
+  const isNote = pathname.startsWith("/writing/");
 
   useEffect(() => {
-    const project = slug ? projects.find((p) => p.slug === slug) : undefined;
+    const note = slug && isNote ? notes.find((n) => n.slug === slug) : undefined;
+    const project = slug && !isNote ? projects.find((p) => p.slug === slug) : undefined;
 
-    const meta: Meta = project
+    const meta: Meta = note
+      ? {
+          title: `${note.title} — ${identity.name}`,
+          description: note.standfirst,
+          path: `/writing/${note.slug}`,
+        }
+      : project
       ? {
           title: `${project.title} — ${identity.name}`,
           description: `${project.lede} ${project.blurb}`,
           path: `/projects/${project.slug}`,
         }
-      : { ...(PAGES[pathname] ?? PAGES["/"]), path: pathname };
+      : {
+          ...(PAGES[pathname] ?? {
+            title: `Page not found — ${identity.name}`,
+            description: "There is nothing at this address.",
+          }),
+          path: pathname,
+        };
 
     document.title = meta.title;
     setMeta("name", "description", meta.description);
@@ -72,7 +90,18 @@ export function DocumentHead() {
     setLink("canonical", SITE + meta.path);
 
     setJsonLd(
-      project
+      note
+        ? {
+            "@context": "https://schema.org",
+            "@type": "BlogPosting",
+            headline: note.title,
+            description: note.standfirst,
+            datePublished: note.date,
+            articleSection: note.topic,
+            url: SITE + meta.path,
+            author: { "@type": "Person", name: identity.name },
+          }
+        : project
         ? {
             "@context": "https://schema.org",
             "@type": "CreativeWork",
@@ -95,7 +124,7 @@ export function DocumentHead() {
             knowsAbout: ["Brand identity", "Interface design", "Motion design", "Front-end development"],
           }
     );
-  }, [pathname, slug]);
+  }, [pathname, slug, isNote]);
 
   return null;
 }

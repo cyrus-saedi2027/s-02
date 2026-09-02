@@ -47,8 +47,16 @@ type StartViewTransition = (cb: () => void | Promise<void>) => {
  * `done` runs once the transition has finished or failed. It exists for the
  * shared-element handoff: a `view-transition-name` has to be unique in the
  * document, so whichever plate borrows one has to give it back.
+ *
+ * `wipe` picks which of the two changes of page this is. Between the main
+ * pages it is the wipe above. Opening a project it is a short plain fade,
+ * because the cover growing into the next page's hero is already the story
+ * and the wipe was talking over it.
  */
-export function withPageTransition(commit: () => void, done?: () => void) {
+export function withPageTransition(
+  commit: () => void,
+  { wipe = true, done }: { wipe?: boolean; done?: () => void } = {}
+) {
   if (!canAnimate()) {
     commit();
     done?.();
@@ -56,7 +64,9 @@ export function withPageTransition(commit: () => void, done?: () => void) {
   }
 
   const doc = document as Document & { startViewTransition: StartViewTransition };
-  document.documentElement.dataset.pageTransition = "true";
+  // The mode is what index.css keys the wipe on, so a change of page that has
+  // a cover doing the travelling can ask for the quiet one instead.
+  document.documentElement.dataset.pageTransition = wipe ? "wipe" : "plain";
   // Under the wipe, not over it — it is silent unless the visitor asked.
   playTransition();
 

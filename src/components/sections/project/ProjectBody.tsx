@@ -155,6 +155,10 @@ export function ProjectNext({ next }: { next: Project }) {
           className="group grid items-center gap-8 lg:grid-cols-[1.2fr_1fr] lg:gap-16"
         >
           <motion.div
+            // Tagged like an index row, so clicking through from one project
+            // to the next carries this plate rather than cross-fading two
+            // different pictures at the same spot.
+            data-project-cover={next.slug}
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.25 }}

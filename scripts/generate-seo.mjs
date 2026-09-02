@@ -26,10 +26,31 @@ const PUBLIC = path.join(ROOT, "public");
 const SITE = (process.env.VITE_SITE_URL || "https://zaylamonroe.com").replace(/\/+$/, "");
 
 const source = fs.readFileSync(path.join(ROOT, "src/data/site.ts"), "utf8");
-const slugs = [...source.matchAll(/^\s*slug:\s*"([a-z0-9-]+)"/gm)].map((m) => m[1]);
 
-if (!slugs.length) {
-  console.error("No project slugs found in src/data/site.ts — refusing to write a sitemap that would be wrong.");
+/**
+ * Slugs, per array.
+ *
+ * A plain search for `slug:` across the file is what this did first, and it
+ * was wrong the moment a second thing had slugs: the notes were emitted as
+ * project URLs. Each array is sliced out by name and read on its own, so a
+ * third list cannot quietly join the wrong one.
+ */
+function slugsIn(arrayName) {
+  const start = source.indexOf(`export const ${arrayName}`);
+  if (start === -1) return [];
+  const end = source.indexOf("\n];", start);
+  if (end === -1) return [];
+  return [...source.slice(start, end).matchAll(/^\s*slug:\s*"([a-z0-9-]+)"/gm)].map((m) => m[1]);
+}
+
+const projectSlugs = slugsIn("projects");
+const noteSlugs = slugsIn("notes");
+
+if (!projectSlugs.length || !noteSlugs.length) {
+  console.error(
+    `Expected project and note slugs in src/data/site.ts; found ${projectSlugs.length} and ${noteSlugs.length}. ` +
+      "Refusing to write a sitemap that would be wrong."
+  );
   process.exit(1);
 }
 
@@ -39,8 +60,10 @@ const routes = [
   ["/about", "0.8", "monthly"],
   ["/projects", "0.9", "weekly"],
   ["/playground", "0.7", "weekly"],
+  ["/writing", "0.7", "weekly"],
   ["/contact", "0.6", "monthly"],
-  ...slugs.map((s) => [`/projects/${s}`, "0.8", "monthly"]),
+  ...projectSlugs.map((s) => [`/projects/${s}`, "0.8", "monthly"]),
+  ...noteSlugs.map((s) => [`/writing/${s}`, "0.6", "yearly"]),
 ];
 
 const today = new Date().toISOString().slice(0, 10);

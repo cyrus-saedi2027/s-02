@@ -14,18 +14,23 @@ import { useReducedMotion } from "./useMediaQuery";
  *
  * `strength` is the fraction of that distance travelled: the buttons use 0.32,
  * which is right for something 180px wide and far too much for a plate half
- * the screen across. Around 0.1 is the useful range there.
+ * the screen across.
  *
- * The translation comes with a tilt, and the tilt is what you actually see. A
- * plate that shifts twenty pixels across a thousand-pixel cover is a change
- * you can measure and not one you can notice; the same plate turning a couple
- * of degrees toward your hand reads immediately. `tilt` is that angle in
- * degrees at the far corner.
+ * The translation comes with a tilt, and the tilt is what you actually see —
+ * a plate turning toward your hand reads where a translation of any size does
+ * not. `tilt` is that angle in degrees at the far corner.
+ *
+ * Both are deliberately small. An earlier pass ran four times these numbers,
+ * and at that size the tilt stopped reading as a plate answering the pointer
+ * and started reading as the artwork being distorted: a perspective rotation
+ * that steep foreshortens the image, and on a cover half the screen wide there
+ * is enough of it to see the picture bend. The point is to acknowledge the
+ * pointer, not to throw the work around.
  *
  * Returns nothing to bind under a reduced-motion preference: the values stay
  * at zero and the handlers are no-ops, so callers need no branch of their own.
  */
-export function usePointerLean(strength = 0.1, tilt = 6) {
+export function usePointerLean(strength = 0.025, tilt = 1.5) {
   const ref = useRef<HTMLElement>(null);
   const calm = useReducedMotion();
 

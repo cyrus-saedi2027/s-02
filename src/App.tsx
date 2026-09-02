@@ -1,4 +1,4 @@
-import { Suspense, lazy, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { flushSync } from "react-dom";
 import { MotionConfig } from "framer-motion";
 import { HashRouter, Route, Routes, useLocation, useNavigate } from "react-router-dom";
@@ -19,40 +19,54 @@ import Home from "./pages/Home";
  * Every page but the home page is fetched when it is first asked for.
  *
  * The whole site used to arrive as one bundle, so opening the home page paid
- * to parse four other pages and seven case studies nobody had asked to see.
+ * to parse four other pages, seven case studies and a scheduler nobody had
+ * asked to see.
  *
- * The import functions are kept beside the lazy components on purpose: the
- * click handler calls one directly before starting a transition. Left to
- * Suspense, the view transition would snapshot the fallback — the API captures
- * the new state the moment the commit returns, and a chunk still in flight
- * means what it captures is an empty page rather than the one arriving.
+ * `pageLoader` rather than `React.lazy`, because these have to be able to
+ * render synchronously: the click handler preloads the page before starting a
+ * transition, and a `lazy` component suspends for a microtask on its first
+ * render even with the module already cached — which `flushSync` cannot wait
+ * for, so the transition snapshotted a Suspense fallback. See lib/pageLoader.
  */
-const load = {
-  "/about": () => import("./pages/AboutPage"),
-  "/projects": () => import("./pages/ProjectsPage"),
-  "/playground": () => import("./pages/PlaygroundPage"),
-  "/contact": () => import("./pages/ContactPage"),
-  project: () => import("./pages/ProjectPage"),
-};
 
 /**
  * The booking panel is the largest thing on the site and nobody sees it until
  * they ask for one — a scheduler, a month of dates, a timezone table. It is
  * fetched on the click that opens it.
  */
-const BookingDialog = lazy(() =>
+const BookingDialog = pageLoader(() =>
   import("./components/sections/Booking").then((m) => ({ default: m.BookingDialog }))
 );
 
-const AboutPage = lazy(load["/about"]);
-const ProjectsPage = lazy(load["/projects"]);
-const PlaygroundPage = lazy(load["/playground"]);
-const ContactPage = lazy(load["/contact"]);
-const ProjectPage = lazy(load.project);
+const NotFound = pageLoader(() => import("./pages/NotFound"));
+const AboutPage = pageLoader(() => import("./pages/AboutPage"));
+const ProjectsPage = pageLoader(() => import("./pages/ProjectsPage"));
+const PlaygroundPage = pageLoader(() => import("./pages/PlaygroundPage"));
+const ContactPage = pageLoader(() => import("./pages/ContactPage"));
+const WritingPage = pageLoader(() => import("./pages/WritingPage"));
+const NotePage = pageLoader(() => import("./pages/NotePage"));
+const ProjectPage = pageLoader(() => import("./pages/ProjectPage"));
+
+/** The page a path needs in hand, or undefined for one already here. */
+const preloadFor = (path: string) =>
+  PROJECT_PATH.test(path)
+    ? ProjectPage.preload
+    : NOTE_PATH.test(path)
+      ? NotePage.preload
+      : (
+          {
+            "/about": AboutPage.preload,
+            "/projects": ProjectsPage.preload,
+            "/playground": PlaygroundPage.preload,
+            "/contact": ContactPage.preload,
+            "/writing": WritingPage.preload,
+          } as Record<string, (() => Promise<unknown>) | undefined>
+        )[path];
 
 import { useSmoothScroll } from "./hooks/useSmoothScroll";
 import { useReducedMotion } from "./hooks/useMediaQuery";
 import { withPageTransition } from "./lib/pageTransition";
+import { pageLoader } from "./lib/pageLoader";
 
 /**
  * Pointer style. "ring" is a precise dot with a hollow outlined circle
@@ -62,16 +76,13 @@ import { withPageTransition } from "./lib/pageTransition";
 const CURSOR_VARIANT: CursorVariant = "ring";
 
 /** Paths the in-page router owns. Anything else is left to the browser. */
-const ROUTES = ["/", "/about", "/projects", "/playground", "/contact"];
+const ROUTES = ["/", "/about", "/projects", "/playground", "/writing", "/contact"];
 
-/** Every project has its own page under /projects, so the list is not exhaustive. */
+/** Projects and notes each have their own page, so the list is not exhaustive. */
 const PROJECT_PATH = /^\/projects\/([a-z0-9-]+)$/;
+const NOTE_PATH = /^\/writing\/([a-z0-9-]+)$/;
 const isSiteRoute = (path: string) =>
-  ROUTES.includes(path) || PROJECT_PATH.test(path);
-
-/** The chunk a path needs, or undefined for one already here. */
-const chunkFor = (path: string) =>
-  PROJECT_PATH.test(path) ? load.project : load[path as keyof typeof load];
+  ROUTES.includes(path) || PROJECT_PATH.test(path) || NOTE_PATH.test(path);
 
 /**
  * The plate on this page for `slug`, if the visitor can see it.
@@ -216,7 +227,27 @@ function Shell() {
       const go = () => {
         // Going to a project page, the plate that was clicked travels with you.
         const cover = visibleCover(path.match(PROJECT_PATH)?.[1] ?? "");
+
+        // A project page's own hero answers to the same name. Leaving one for
+        // another, both it and the plate just clicked would claim it — two
+        // elements holding one view-transition-name is invalid and the browser
+        // drops the transition, which is exactly what going from one project
+        // to the next used to look like. The outgoing hero stands down.
+        const outgoingHero = cover
+          ? document.querySelector<HTMLElement>("[data-project-hero]")
+          : null;
+        if (outgoingHero && outgoingHero !== cover) {
+          outgoingHero.setAttribute("data-vt-suppress", "");
+        }
         if (cover) cover.style.viewTransitionName = "project-cover";
+
+        // The wipe is for moving between the main pages. Opening or leaving a
+        // project gets the quiet fade instead: the cover growing into the next
+        // hero already says a page has changed, and running both read as a
+        // stutter — the plate finished travelling half a second before the
+        // page behind it arrived.
+        const intoOrOutOfProject =
+          PROJECT_PATH.test(path) || PROJECT_PATH.test(location.pathname);
 
         withPageTransition(
           () => {
@@ -230,22 +261,44 @@ function Shell() {
             // going.
             flushSync(() => navigate(path + url.hash));
             if (!url.hash) window.scrollTo(0, 0);
-          },
-          () => {
-            // Hand the name back: two elements wearing it at once is invalid
-            // and the browser drops the transition entirely.
+
+            // Both handoffs are undone here rather than in `done`, because
+            // the API captures the old state before this callback runs and the
+            // new state after it returns — and React reuses these very DOM
+            // nodes across one project and the next.
+            //
+            // The hero: an attribute left on past this point silences it in
+            // the new capture too, so the plate is lifted out with nowhere to
+            // land. The cover: the next-project card that was clicked is
+            // still the next-project card afterwards, pointing at a different
+            // project — and if it is still wearing the name, it and the
+            // incoming hero both claim it. The browser says so out loud
+            // ("Unexpected duplicate view-transition-name") and drops the
+            // whole transition, which is what one project opening another
+            // used to look like.
+            outgoingHero?.removeAttribute("data-vt-suppress");
             if (cover) cover.style.viewTransitionName = "";
+          },
+          {
+            wipe: !intoOrOutOfProject,
+            done: () => {
+              // Belt and braces: a transition that never started leaves the
+              // commit callback unrun, so the handoff has to be undone here
+              // too or the next one begins from a document with two claimants.
+              if (cover) cover.style.viewTransitionName = "";
+              outgoingHero?.removeAttribute("data-vt-suppress");
+            },
           }
         );
       };
 
-      // Have the page in hand before the wipe starts, so the transition
-      // snapshots the page and not a Suspense fallback: the API captures the
-      // new state the moment the commit returns, and a chunk still in flight
-      // means what it captures is an empty page. An already-loaded chunk
-      // resolves from cache, so a second visit to a route pays nothing.
-      const chunk = chunkFor(path);
-      if (chunk) void chunk().then(go);
+      // Have the page in hand before the transition starts. The API captures
+      // the new state the moment the commit returns, so a page still arriving
+      // is captured as the placeholder standing in for it — which is what the
+      // cover used to travel into on a first visit to a project. An
+      // already-loaded page resolves immediately.
+      const preload = preloadFor(path);
+      if (preload) void preload().then(go);
       else go();
     };
 
@@ -290,33 +343,25 @@ function Shell() {
       {/* Not mounted at all until it is wanted, so its chunk is not fetched
           either. No fallback: there is nothing on screen to hold a place for,
           and the panel arriving a beat late reads as it opening. */}
-      {bookingOpen && (
-        <Suspense fallback={null}>
-          <BookingDialog open onClose={() => setBookingOpen(false)} />
-        </Suspense>
-      )}
+      {bookingOpen && <BookingDialog open onClose={() => setBookingOpen(false)} />}
 
       {/* The page body is opaque and rides above the closing wordmark, which
           is pinned to the bottom of the viewport behind it. Scrolling to the
           end slides this block up off the strip and uncovers it. */}
       <div className="relative z-10 bg-ink">
-        {/* One screen of nothing rather than a spinner. A route change is
-            already covered by the wipe, and on a cold load of a deep link the
-            preloader is still up — so this is only ever seen if a chunk is
-            genuinely slow, where a blank hold reads better than a flash of
-            loading furniture. */}
-        <Suspense fallback={<div className="min-h-screen" />}>
-          <Routes>
-            <Route path="/" element={<Home ready={ready} onBook={openBooking} />} />
-            <Route path="/about" element={<AboutPage onBook={openBooking} />} />
-            <Route path="/projects" element={<ProjectsPage onBook={openBooking} />} />
-            <Route path="/projects/:slug" element={<ProjectPage onBook={openBooking} />} />
-            <Route path="/playground" element={<PlaygroundPage onBook={openBooking} />} />
-            <Route path="/contact" element={<ContactPage onBook={openBooking} />} />
-            {/* Anything unrecognised falls back to the home page. */}
-            <Route path="*" element={<Home ready={ready} onBook={openBooking} />} />
-          </Routes>
-        </Suspense>
+        <Routes>
+          <Route path="/" element={<Home ready={ready} onBook={openBooking} />} />
+          <Route path="/about" element={<AboutPage onBook={openBooking} />} />
+          <Route path="/projects" element={<ProjectsPage onBook={openBooking} />} />
+          <Route path="/projects/:slug" element={<ProjectPage onBook={openBooking} />} />
+          <Route path="/playground" element={<PlaygroundPage onBook={openBooking} />} />
+          <Route path="/contact" element={<ContactPage onBook={openBooking} />} />
+          <Route path="/writing" element={<WritingPage onBook={openBooking} />} />
+          <Route path="/writing/:slug" element={<NotePage onBook={openBooking} />} />
+            {/* Anything unrecognised says so, rather than rendering the home
+                page and letting a dead link look like it worked. */}
+          <Route path="*" element={<NotFound onBook={openBooking} />} />
+        </Routes>
 
         <Footer />
       </div>

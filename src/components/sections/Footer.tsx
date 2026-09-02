@@ -16,9 +16,13 @@ export function Footer() {
         <div className="grid gap-12 pb-16 md:grid-cols-2 lg:grid-cols-4 lg:gap-8">
           {/* Identity */}
           <Reveal className="lg:col-span-2">
-            <h3 className="text-[clamp(1.75rem,3.5vw,2.75rem)] font-medium leading-none tracking-tighter">
+            {/* h2, not h3: the footer is its own landmark and starts its own
+                outline. As an h3 it depended on the page above having used an
+                h2 — true everywhere until the 404, which has a masthead and
+                nothing else, and skipped a level. */}
+            <h2 className="text-[clamp(1.75rem,3.5vw,2.75rem)] font-medium leading-none tracking-tighter">
               {identity.name}
-            </h3>
+            </h2>
             <p className="mt-3 font-sans text-2xs uppercase tracking-wider text-accent">
               {identity.role}
             </p>

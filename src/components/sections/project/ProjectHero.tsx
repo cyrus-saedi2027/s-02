@@ -8,11 +8,12 @@ const EASE = [0.22, 1, 0.36, 1] as const;
  * How a project page opens: the cover full-bleed, the title over it, and the
  * facts of the job in a rule underneath.
  *
- * The cover carries `view-transition-name: project-cover`, which is what lets
- * the same plate in the index grow into this one rather than the page cutting.
- * The name has to be unique in the document at any moment, so only ever one
- * plate wears it — the index gives it to the row being opened and takes it
- * back afterwards.
+ * The cover carries `view-transition-name: project-cover` — through a class
+ * rather than an inline style, so the shell can silence it with an attribute
+ * without React putting it straight back on the next render. That matters
+ * when one project opens another: this hero and the card that was clicked
+ * would both answer to the name, and two elements holding one is invalid, so
+ * the browser drops the transition entirely rather than choosing.
  */
 export function ProjectHero({ project }: { project: Project }) {
   return (
@@ -22,8 +23,8 @@ export function ProjectHero({ project }: { project: Project }) {
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: EASE }}
-          className="relative overflow-hidden rounded-2xl"
-          style={{ viewTransitionName: "project-cover" }}
+          data-project-hero=""
+          className="vt-project-cover relative overflow-hidden rounded-2xl"
         >
           <img
             src={project.cover}

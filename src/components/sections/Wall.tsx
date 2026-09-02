@@ -80,7 +80,7 @@ function Plate({ tile }: { tile: WallTile }) {
   const canPlay = !calm;
   // Gentler than the project plates: these sit shoulder to shoulder, and a
   // tile leaning as far as a half-width cover would knock into its neighbours.
-  const lean = usePointerLean(0.06, 9);
+  const lean = usePointerLean(0.015, 2.25);
 
   return (
     <motion.div

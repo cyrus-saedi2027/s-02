@@ -131,7 +131,7 @@
    *colour* survives that — the gradient does not — so the ramp is painted here,
    on the root of the transition tree, where it is unambiguously behind both
    snapshots and sized to the viewport. */
-::view-transition {
+html[data-page-transition="wipe"]::view-transition {
   background: linear-gradient(
     134deg,
     theme("colors.accent.DEFAULT") 0%,
@@ -139,15 +139,15 @@
   );
 }
 
-::view-transition-old(root),
-::view-transition-new(root) {
+html[data-page-transition="wipe"]::view-transition-old(root),
+html[data-page-transition="wipe"]::view-transition-new(root) {
   /* The default plus-lighter blend would brighten the overlap into pink where
      the two pages cross. */
   mix-blend-mode: normal;
   backface-visibility: hidden;
 }
 
-::view-transition-old(root) {
+html[data-page-transition="wipe"]::view-transition-old(root) {
   animation: vt-exit 1s cubic-bezier(0.73, 0, 0.33, 1) 0s both;
   /* 0deg puts the gradient's 0% at the bottom edge: below the edge is clear,
      above it is kept, so the page is taken away from the bottom up. */
@@ -163,7 +163,7 @@
   );
 }
 
-::view-transition-new(root) {
+html[data-page-transition="wipe"]::view-transition-new(root) {
   animation: vt-enter 1s cubic-bezier(0.73, 0, 0.33, 1) 0.5s both;
   /* The same edge, inverted, so the arriving page is uncovered from the bottom. */
   -webkit-mask-image: linear-gradient(
@@ -176,6 +176,41 @@
     #000 calc(100% * var(--vt-wipe)),
     transparent calc(100% * var(--vt-wipe))
   );
+}
+
+/* Opening a project is a different kind of change of page, so it gets a
+   different one.
+   The wipe announces that you have gone somewhere else — right between the
+   main pages, and wrong here, where the cover you clicked is already telling
+   that story by growing into the next page's hero. Two announcements at once
+   read as a stutter, and the wipe's half-second hand-over meant the plate
+   finished travelling before the page it was travelling into had arrived.
+   So the root just fades, briefly and without the accent ground behind it,
+   and the plate is the only thing worth watching. */
+@keyframes vt-plain-out { to { opacity: 0; } }
+@keyframes vt-plain-in { from { opacity: 0; } }
+
+html[data-page-transition="plain"]::view-transition-old(root) {
+  animation: vt-plain-out 0.3s ease-out both;
+  mix-blend-mode: normal;
+}
+
+html[data-page-transition="plain"]::view-transition-new(root) {
+  animation: vt-plain-in 0.3s 0.06s ease-in both;
+  mix-blend-mode: normal;
+}
+
+/* Whichever plate is travelling wears the name; anything else that would
+   claim it stands down for the duration. Two elements holding one
+   view-transition-name is invalid and the browser drops the whole
+   transition — which is what a project page opening another project used to
+   do, its own hero and the incoming one both answering to `project-cover`. */
+.vt-project-cover {
+  view-transition-name: project-cover;
+}
+
+[data-vt-suppress] {
+  view-transition-name: none !important;
 }
 
 /* The cover that travels between the projects index and a project page.

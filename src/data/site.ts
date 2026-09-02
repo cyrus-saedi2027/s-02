@@ -521,6 +521,7 @@ export const navLinks = [
   { label: "About Me", href: "/about" },
   { label: "Projects", href: "/projects" },
   { label: "Playground", href: "/playground" },
+  { label: "Writing", href: "/writing" },
   { label: "Contact", href: "/contact" },
 ];
 /**
@@ -685,6 +686,83 @@ export const honors = {
 export const projectsPage = { title: "Projects" };
 
 export const playgroundPage = { title: "Playground" };
+
+/* ---------------------------------------------------------------------------
+ * /writing
+ * ------------------------------------------------------------------------- */
+
+export const writingPage = { title: "Writing" };
+
+/**
+ * Short technical notes.
+ *
+ * `body` is an array of paragraphs rather than one blob: it keeps the copy
+ * legible in the source and means the renderer never has to parse anything.
+ * A `pull` is set large between paragraphs — the one sentence the note is
+ * really about.
+ */
+export type Note = {
+  slug: string;
+  title: string;
+  standfirst: string;
+  date: string;
+  /** Shown as "4 min", worked out once by hand rather than counted at runtime. */
+  minutes: number;
+  topic: string;
+  body: string[];
+  pull: string;
+};
+
+export const notes: Note[] = [
+  {
+    slug: "the-cost-of-a-scroll-handler",
+    title: "The cost of a scroll handler",
+    standfirst:
+      "A smooth-scrolling page dropped frames on long documents. The cause was one property read.",
+    date: "2025-11-04",
+    minutes: 4,
+    topic: "Performance",
+    body: [
+      "The inertial scrolling on this site drives window.scrollTo from a requestAnimationFrame loop. Each tick has to clamp the target to the bottom of the document, which needs the document's height, which is document.documentElement.scrollHeight. That reads perfectly well. It also costs a full synchronous layout every time it is called, because during a scroll the layout tree is always dirty and the browser has to settle it before it can answer.",
+      "On a short page nobody notices. On this one — around eighteen thousand pixels of it, with a tall position: sticky subtree in the middle — the read measured about 35ms. Once per wheel event. The page was doing a complete layout pass for a number that changes perhaps four times in a session.",
+      "The fix is to stop asking. A ResizeObserver on the root element reports the height when it actually changes, the loop reads a cached number, and the clamp is the same clamp. What made it slightly more interesting was the first value: the observer does not report until the next frame, so the loop needs something before then. Reading it once at setup put the 35ms back — and put it on the single busiest frame of the page load, where the preloader lifts and the hero starts to move. Starting the limit at Infinity and letting the observer supply the first real value costs nothing, because a target above the document is clamped by the browser anyway.",
+      "The general shape of this is worth keeping: a value that is cheap to read once and expensive to read often is not a value you read in a loop. It is a value you subscribe to.",
+    ],
+    pull: "A number that changes four times a session was being recomputed sixty times a second.",
+  },
+  {
+    slug: "view-transitions-snapshot-early",
+    title: "View transitions snapshot earlier than you think",
+    standfirst:
+      "A shared element refused to travel. The animation was fine; the page underneath it was not where it would end up.",
+    date: "2025-12-18",
+    minutes: 5,
+    topic: "Browser",
+    body: [
+      "The projects index hands its cover plate to the project page it opens: both wear the same view-transition-name, so the browser lifts that element out of the page snapshot and morphs it between its two positions while everything else wipes. It is three lines of CSS and one line of JavaScript, and when it works it is the best kind of effect — the one that looks expensive and is not.",
+      "It did not work. The plate faded in at its destination instead of travelling to it. Two rounds of debugging went into the animation itself before the actual cause turned up somewhere else entirely: the scroll reset.",
+      "startViewTransition captures the new state the moment its callback returns. The route commit was inside that callback, but the scroll reset that puts a new page at the top was in a React effect — which runs after. So the browser measured the incoming page while it was still sitting at the old page's scroll offset, and the hero it was measuring had not reached its resting place. The wipe covered that discrepancy for everything else. The travelling plate had no cover: it was aiming at a position that would not exist a frame later.",
+      "Moving the reset inside the commit fixed it in one line. The lesson is about where the boundary is: anything that affects the geometry of the incoming page has to happen before that callback returns, and an effect is already too late.",
+    ],
+    pull: "The animation was never wrong. It was aiming at a position that would not exist a frame later.",
+  },
+  {
+    slug: "measuring-your-own-measurements",
+    title: "Measuring your own measurements",
+    standfirst:
+      "Three times on one project my tooling reported a failure that was not there. Each one nearly became a fix.",
+    date: "2026-01-22",
+    minutes: 4,
+    topic: "Practice",
+    body: [
+      "A probe that parsed CSS transforms read matrix() and reported zero movement for an effect that had just started using a 3D perspective — where the computed value is matrix3d() and the translation sits at indices twelve and thirteen instead of four and five. The effect was working. The measurement was not.",
+      "A font-metrics probe reported one weight of Poppins as narrower than the system fallback it was being compared against, which cannot happen. It was measuring before document.fonts.load had resolved, so it was comparing the fallback with itself.",
+      "A contrast test set Playwright's contrast option to \"more\" and found the CSS unchanged. The option is accepted and does not emulate; matchMedia returned false in both cases. The stylesheet was correct and the harness was never asking the question.",
+      "In all three the instinct was the same and wrong: the measurement disagreed with the code, so the code must be broken. What actually saves time is a habit — when a result is surprising, check the instrument before changing anything. A number that says something impossible is telling you about itself, not about the thing it measured.",
+    ],
+    pull: "A number that says something impossible is telling you about itself, not the thing it measured.",
+  },
+];
 
 /* ---------------------------------------------------------------------------
  * /contact

@@ -101,17 +101,44 @@ These change what the site *says*, which is where the biggest gap is.
       Switching to `BrowserRouter` is what would finish the job, and it would
       cost the single-file build.
 
+### Also, along the way
+
+- **Opening a project no longer plays the wipe.** The gradient change-of-page
+  screen is for moving between the main pages; opening a project gets a short
+  plain fade, because the cover growing into the next hero already says a page
+  has changed and running both read as a stutter. Two bugs surfaced fixing it,
+  both diagnosed from what the browser reported rather than guessed at: React
+  reuses the very same hero and next-project-card DOM nodes across one project
+  and the next, so the handoff has to be undone inside the commit — after the
+  old capture, before the new one — or the plate is lifted out with nowhere to
+  land, or two elements claim one `view-transition-name` and the browser drops
+  the transition outright ("Unexpected duplicate view-transition-name", which
+  it says in the console). And `React.lazy` suspends for a microtask even with
+  the module cached, which `flushSync` cannot wait for — so a first visit to a
+  project snapshotted the Suspense fallback, a 1539px empty screen where a
+  6036px page should have been. `lib/pageLoader` replaces it with a loader that
+  renders synchronously once preloaded.
+
+- **The pointer lean is a quarter of what it was.** At the first size the tilt
+  stopped reading as a plate answering the pointer and started reading as the
+  artwork being bent.
+
 ## D — Bolder
 
-- [ ] **12. A real 404.** Any unrecognised route silently renders the home
-      page, so a mistyped URL lies about where you are.
+- [x] **12. A real 404.** An unrecognised route now says so and offers the six
+      places you might have been going, instead of rendering the home page and
+      letting a dead link look like it worked. An unknown project or note slug
+      lands there too.
 
 - [ ] **13. A light theme.** The site is dark only. The tokens are already
       centralised in `tailwind.config.ts`, so the work is mostly in choosing
       the second palette rather than in plumbing.
 
-- [ ] **14. Writing.** Short technical notes — the thing that separates a
-      portfolio that lists work from one that shows how its author thinks.
+- [x] **14. Writing.** `/writing` and a page per note — three to start,
+      each about something that actually went wrong on this site and what it
+      turned out to be. A single measured column with the scroll effects kept
+      off the body: the rest of the site is built to be looked at, this page is
+      built to be read, and the two want opposite things.
 
 ---
 
