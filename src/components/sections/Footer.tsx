@@ -4,6 +4,7 @@ import { HoverStaggerLabel } from "../ui/AnimatedText";
 import { SocialLink } from "../ui/SocialLink";
 import { SoundToggle } from "../ui/SoundToggle";
 import { MotionToggle } from "../ui/MotionToggle";
+import { ThemeToggle } from "../ui/ThemeToggle";
 import { identity, navLinks, socials } from "@/data/site";
 
 export function Footer() {
@@ -88,6 +89,7 @@ export function Footer() {
             Designed &amp; built in Amsterdam
           </span>
           <span className="flex flex-wrap items-center gap-x-6 gap-y-3">
+            <ThemeToggle />
             <SoundToggle />
             <MotionToggle />
           </span>

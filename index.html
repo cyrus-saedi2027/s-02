@@ -17,7 +17,22 @@
          which is what the page settles on anyway. -->
     <style>
       html { background: #000; }
+      html[data-theme="light"] { background: #f6f4f0; }
     </style>
+    <!-- Runs before the first paint, because the alternative is a flash of the
+         wrong ground on every visit: the stylesheet is render-blocking but the
+         bundle that reads the preference is not, so without this the page is
+         painted black and then corrected. Kept to one expression and wrapped,
+         since a visitor with storage blocked must still get a page. -->
+    <script>
+      try {
+        var t = localStorage.getItem("zayla:theme");
+        if (t !== "dark" && t !== "light") {
+          t = matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+        }
+        if (t === "light") document.documentElement.dataset.theme = "light";
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

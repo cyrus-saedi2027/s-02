@@ -39,7 +39,7 @@ export function CTA({ onBook }: { onBook: () => void }) {
         style={{ y: bloomY, scale: bloomScale }}
         className="pointer-events-none absolute left-1/2 top-1/2 h-[70vw] w-[70vw] max-w-[900px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-[0.18] blur-[120px]"
       >
-        <div className="h-full w-full rounded-full bg-[radial-gradient(circle_at_50%_50%,#fd321c_0%,#ff8a00_45%,transparent_70%)]" />
+        <div className="h-full w-full rounded-full bg-[radial-gradient(circle_at_50%_50%,rgb(var(--c-accent))_0%,rgb(var(--c-accent-warm))_45%,transparent_70%)]" />
       </motion.div>
 
       <div className="shell relative">

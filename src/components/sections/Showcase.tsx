@@ -26,13 +26,13 @@ export function Showcase() {
           way up. */}
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-full h-24 bg-gradient-to-t from-black/85 to-transparent"
+        className="pointer-events-none absolute inset-x-0 bottom-full h-24 bg-gradient-to-t from-ink/85 to-transparent"
       />
 
       {/* A hairline of light along the edge, so the seam reads at any scroll. */}
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 h-px rounded-t-[1.75rem] bg-gradient-to-r from-transparent via-white/25 to-transparent"
+        className="pointer-events-none absolute inset-x-0 top-0 h-px rounded-t-[1.75rem] bg-gradient-to-r from-transparent via-paper/25 to-transparent"
       />
 
       <div className="shell py-24 md:py-32">
@@ -96,7 +96,7 @@ function Plate({
         />
         {/* Plain type over a shadow rather than a blend mode: blending makes the
             compositor read back what is behind the label on every frame. */}
-        <span className="pointer-events-none absolute left-4 top-4 font-sans text-2xs font-semibold tracking-wider text-white/80 [text-shadow:0_1px_6px_rgba(0,0,0,0.7)]">
+        <span className="pointer-events-none absolute left-4 top-4 font-sans text-2xs font-semibold tracking-wider text-paper/80 [text-shadow:0_1px_6px_rgba(0,0,0,0.7)]">
           {n}
         </span>
       </div>

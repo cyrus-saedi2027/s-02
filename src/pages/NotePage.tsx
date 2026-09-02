@@ -47,7 +47,7 @@ export default function NotePage({ onBook }: { onBook: () => void }) {
               <RisingText text={note.title} stagger={0.01} />
             </h1>
 
-            <p className="mt-8 max-w-[52ch] text-[clamp(1.1rem,1.9vw,1.5rem)] font-medium leading-[1.45] text-white/80">
+            <p className="mt-8 max-w-[52ch] text-[clamp(1.1rem,1.9vw,1.5rem)] font-medium leading-[1.45] text-paper/80">
               {note.standfirst}
             </p>
 
@@ -68,7 +68,7 @@ export default function NotePage({ onBook }: { onBook: () => void }) {
                 viewport={{ once: true, amount: 0.2 }}
                 transition={{ duration: 0.6, ease: EASE }}
               >
-                <p className="font-sans text-base leading-[1.75] text-white/75 md:text-lg md:leading-[1.7]">
+                <p className="font-sans text-base leading-[1.75] text-paper/75 md:text-lg md:leading-[1.7]">
                   {paragraph}
                 </p>
 

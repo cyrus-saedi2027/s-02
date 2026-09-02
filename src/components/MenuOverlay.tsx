@@ -77,7 +77,7 @@ export function MenuOverlay({
           <motion.nav
             ref={panel}
             id="site-menu"
-            className="fixed inset-x-0 top-0 z-[72] h-[min(56svh,560px)] overflow-hidden rounded-b-2xl border-b border-white/10 bg-[#0a0a0c]/55"
+            className="fixed inset-x-0 top-0 z-[72] h-[min(56svh,560px)] overflow-hidden rounded-b-2xl border-b border-paper/10 bg-glass/55"
             style={{
               willChange: "transform",
               backdropFilter: `blur(${GLASS_BLUR}px) saturate(${GLASS_SATURATE})`,

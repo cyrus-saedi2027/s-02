@@ -69,7 +69,7 @@ function Panel({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.4 }}
       transition={{ duration: 0.6, ease: EASE, delay: Math.min(index, 4) * 0.05 }}
-      className="overflow-hidden rounded-[10px] bg-white/[0.06] transition-colors duration-300 hover:bg-white/[0.09]"
+      className="overflow-hidden rounded-[10px] bg-paper/[0.06] transition-colors duration-300 hover:bg-paper/[0.09]"
     >
       <button
         type="button"

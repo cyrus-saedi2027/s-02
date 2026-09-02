@@ -140,7 +140,7 @@ function EnquiryForm() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: EASE }}
-          className="rounded-[10px] border border-hair bg-white/[0.03] p-8"
+          className="rounded-[10px] border border-hair bg-paper/[0.03] p-8"
           role="status"
         >
           <p className="text-lg font-medium">
@@ -236,10 +236,10 @@ function Field({
   autoComplete?: string;
 }) {
   const shared =
-    "w-full bg-transparent font-sans text-base text-paper outline-none placeholder:text-white/40";
+    "w-full bg-transparent font-sans text-base text-paper outline-none placeholder:text-paper/40";
 
   return (
-    <label className="block border-b border-white/20 transition-colors duration-300 ease-swift focus-within:border-accent">
+    <label className="block border-b border-paper/20 transition-colors duration-300 ease-swift focus-within:border-accent">
       <span className="sr-only">{label}</span>
       {textarea ? (
         <textarea
@@ -264,7 +264,7 @@ function Field({
 /** The small cross the reference sets between the form and the details. */
 function PlusRule() {
   return (
-    <div aria-hidden="true" className="text-white/25">
+    <div aria-hidden="true" className="text-paper/25">
       <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
         <path
           d="M14 3v22M3 14h22"

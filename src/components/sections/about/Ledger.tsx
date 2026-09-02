@@ -34,7 +34,7 @@ export function Ledger() {
               <p
                 className={cn(
                   "mt-5 text-md font-medium uppercase leading-[1.1] tracking-normalish",
-                  f.feature ? "text-white/75" : "text-white/60"
+                  f.feature ? "text-paper/75" : "text-paper/60"
                 )}
               >
                 {f.label}
@@ -49,7 +49,7 @@ export function Ledger() {
               <h3 className="text-[clamp(1.35rem,2.1vw,1.9rem)] font-medium uppercase leading-[0.9] tracking-snug">
                 {nte.title}
               </h3>
-              <p className="mt-5 max-w-[42ch] text-md font-medium uppercase leading-[1.1] tracking-normalish text-white/60">
+              <p className="mt-5 max-w-[42ch] text-md font-medium uppercase leading-[1.1] tracking-normalish text-paper/60">
                 {nte.body}
               </p>
             </div>
@@ -87,14 +87,14 @@ function Card({
         className={cn(
           "relative flex h-full min-h-[clamp(17rem,26vw,23.75rem)] flex-col rounded-[10px] p-[clamp(1.25rem,2vw,1.75rem)]",
           feature
-            ? "bg-[linear-gradient(134deg,#fd321c_0%,#ff8a00_100%)] shadow-[0_0_50px_0_rgba(255,94,39,0.5)]"
+            ? "bg-[linear-gradient(134deg,rgb(var(--c-accent))_0%,rgb(var(--c-accent-warm))_100%)] shadow-[0_0_50px_0_rgba(255,94,39,0.5)]"
             : "bg-surfaceUp"
         )}
       >
         <span
           className={cn(
             "font-sans text-2xs font-semibold uppercase tracking-wider",
-            feature ? "text-white/80" : "text-accent"
+            feature ? "text-paper/80" : "text-accent"
           )}
         >
           {index}

@@ -10,19 +10,27 @@ export default {
   prefix: "",
   theme: {
     extend: {
+      /* Every colour is a variable defined in index.css, so one attribute on
+         the root swaps the whole palette. `<alpha-value>` keeps the opacity
+         modifiers working — `text-paper/80` still means what it says.
+
+         hair, hairStrong, dim and dimmer are fixed alphas of the foreground
+         rather than colours in their own right, so they invert with the theme
+         instead of needing a second set. */
       colors: {
-        ink: "#000000",
-        paper: "#ffffff",
+        ink: "rgb(var(--c-ink) / <alpha-value>)",
+        paper: "rgb(var(--c-paper) / <alpha-value>)",
         accent: {
-          DEFAULT: "#fd321c",
-          warm: "#ff8a00",
+          DEFAULT: "rgb(var(--c-accent) / <alpha-value>)",
+          warm: "rgb(var(--c-accent-warm) / <alpha-value>)",
         },
-        hair: "rgba(255,255,255,0.14)",
-        hairStrong: "rgba(255,255,255,0.28)",
-        dim: "rgba(255,255,255,0.56)",
-        dimmer: "rgba(255,255,255,0.38)",
-        surface: "#0a0a0a",
-        surfaceUp: "#111111",
+        hair: "rgb(var(--c-paper) / var(--a-hair))",
+        hairStrong: "rgb(var(--c-paper) / var(--a-hair-strong))",
+        dim: "rgb(var(--c-paper) / var(--a-dim))",
+        dimmer: "rgb(var(--c-paper) / var(--a-dimmer))",
+        surface: "rgb(var(--c-surface) / <alpha-value>)",
+        surfaceUp: "rgb(var(--c-surface-up) / <alpha-value>)",
+        glass: "rgb(var(--c-glass) / <alpha-value>)",
       },
       fontFamily: {
         display: ['Poppins', 'Poppins Fallback', 'system-ui', 'sans-serif'],

@@ -130,9 +130,21 @@ These change what the site *says*, which is where the biggest gap is.
       letting a dead link look like it worked. An unknown project or note slug
       lands there too.
 
-- [ ] **13. A light theme.** The site is dark only. The tokens are already
-      centralised in `tailwind.config.ts`, so the work is mostly in choosing
-      the second palette rather than in plumbing.
+- [x] **13. A light theme.** Every colour is now a CSS variable and the
+      palette is defined twice; one attribute on the root swaps it. The switch
+      in the footer cycles auto → dark → light, and auto keeps following the
+      system rather than throwing the preference away the moment anybody
+      touches it. Stamped before the first paint from `index.html`, so a
+      light-preference visitor never sees the dark ground flash past.
+
+      Two things the plumbing had to get right. The dimmed tiers and hairlines
+      are alphas of the foreground rather than colours of their own, so they
+      invert with it — but the same alpha does not buy the same contrast in
+      both directions: 56% of near-black on off-white measured 4.37:1, under
+      AA, where 56% of white on black is 6.48:1. The alphas are per-theme now
+      and it is 6.64:1. And image scrims stay dark in both, because what a
+      gradient under a title on a photograph has to beat is the picture, not
+      the page.
 
 - [x] **14. Writing.** `/writing` and a page per note — three to start,
       each about something that actually went wrong on this site and what it

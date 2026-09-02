@@ -34,12 +34,12 @@ export function Experience() {
                   {r.company}
                 </p>
                 <h3 className="mt-3 text-[clamp(1.35rem,2.1vw,1.9rem)] font-medium uppercase leading-[0.9] tracking-snug">
-                  <span aria-hidden="true" className="text-white/45">
+                  <span aria-hidden="true" className="text-paper/45">
                     —{" "}
                   </span>
                   {r.role}
                 </h3>
-                <p className="mt-4 max-w-[46ch] text-md font-medium uppercase leading-[1.1] tracking-normalish text-white/55">
+                <p className="mt-4 max-w-[46ch] text-md font-medium uppercase leading-[1.1] tracking-normalish text-paper/55">
                   {r.blurb}
                 </p>
               </div>

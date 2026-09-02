@@ -133,7 +133,7 @@ export function FeatureRow({
         </div>
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-white/10"
+          className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-paper/10"
         />
       </motion.div>
 

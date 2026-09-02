@@ -30,7 +30,7 @@ export function PageMasthead({
           <FitText
             text={title}
             style={{
-              backgroundImage: "linear-gradient(273deg, #ff8a00 0%, #fd321c 100%)",
+              backgroundImage: `linear-gradient(273deg, rgb(var(--c-accent-warm)) 0%, rgb(var(--c-accent)) 100%)`,
               WebkitBackgroundClip: "text",
               backgroundClip: "text",
               WebkitTextFillColor: "transparent",
@@ -40,7 +40,7 @@ export function PageMasthead({
         </motion.div>
 
         {intro && (
-          <p className="mt-8 max-w-[38ch] text-[clamp(1.15rem,1.9vw,1.6rem)] font-medium uppercase leading-[1.15] tracking-snug text-white/55 md:mt-10">
+          <p className="mt-8 max-w-[38ch] text-[clamp(1.15rem,1.9vw,1.6rem)] font-medium uppercase leading-[1.15] tracking-snug text-paper/55 md:mt-10">
             <RisingText text={intro} />
           </p>
         )}

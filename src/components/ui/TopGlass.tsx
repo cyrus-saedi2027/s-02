@@ -56,7 +56,7 @@ export function TopGlass({ hidden = false }: { hidden?: boolean }) {
         className="absolute inset-0"
         style={{
           background:
-            "linear-gradient(to bottom, rgba(6,6,8,0.5) 0%, rgba(6,6,8,0.2) 46%, rgba(6,6,8,0) 100%)",
+            `linear-gradient(to bottom, rgb(var(--c-glass) / 0.5) 0%, rgb(var(--c-glass) / 0.2) 46%, rgb(var(--c-glass) / 0) 100%)`,
         }}
       />
     </motion.div>

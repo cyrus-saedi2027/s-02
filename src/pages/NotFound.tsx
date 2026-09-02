@@ -37,7 +37,7 @@ export default function NotFound({ onBook }: { onBook: () => void }) {
             <FitText
               text="404"
               style={{
-                backgroundImage: "linear-gradient(273deg, #ff8a00 0%, #fd321c 100%)",
+                backgroundImage: `linear-gradient(273deg, rgb(var(--c-accent-warm)) 0%, rgb(var(--c-accent)) 100%)`,
                 WebkitBackgroundClip: "text",
                 backgroundClip: "text",
                 WebkitTextFillColor: "transparent",
@@ -46,7 +46,7 @@ export default function NotFound({ onBook }: { onBook: () => void }) {
             />
           </motion.div>
 
-          <p className="mt-8 max-w-[34ch] text-[clamp(1.15rem,1.9vw,1.6rem)] font-medium uppercase leading-[1.15] tracking-snug text-white/55 md:mt-10">
+          <p className="mt-8 max-w-[34ch] text-[clamp(1.15rem,1.9vw,1.6rem)] font-medium uppercase leading-[1.15] tracking-snug text-paper/55 md:mt-10">
             <RisingText text="There is nothing at this address. It may have moved, or the link may have been wrong to begin with." />
           </p>
 

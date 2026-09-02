@@ -49,7 +49,7 @@ export function ScrollProgress({
   return (
     <motion.div
       aria-hidden="true"
-      className="pointer-events-none fixed right-5 top-1/2 z-[65] hidden h-[clamp(110px,15vh,170px)] w-[3px] -translate-y-1/2 overflow-hidden rounded-full bg-white/15 md:block"
+      className="pointer-events-none fixed right-5 top-1/2 z-[65] hidden h-[clamp(110px,15vh,170px)] w-[3px] -translate-y-1/2 overflow-hidden rounded-full bg-paper/15 md:block"
       initial={{ opacity: 0 }}
       animate={{ opacity: visible ? 1 : 0 }}
       transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}

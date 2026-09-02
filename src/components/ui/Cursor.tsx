@@ -109,7 +109,7 @@ function RingFollower({ x, y, state }: { x: MV; y: MV; state: State }) {
 
   const shape =
     state === "view"
-      ? { width: 104, height: 104, borderWidth: 0, background: "#fd321c", opacity: 1 }
+      ? { width: 104, height: 104, borderWidth: 0, background: "var(--accent)", opacity: 1 }
       : state === "drag"
         ? { width: 76, height: 76, borderWidth: 0, background: "#ffffff", opacity: 1 }
         : state === "hide"
@@ -265,7 +265,7 @@ function CometFollower({ x, y, state }: { x: MV; y: MV; state: State }) {
           <path
             ref={pathRef}
             d={taperedCapsule(base, base, 0)}
-            fill={state === "view" ? "#fd321c" : "#ffffff"}
+            fill={state === "view" ? "var(--accent)" : "rgb(var(--c-paper))"}
             opacity={state === "hide" ? 0.45 : state === "default" ? 0.85 : 1}
           />
         </svg>

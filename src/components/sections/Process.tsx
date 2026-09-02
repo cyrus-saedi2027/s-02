@@ -91,7 +91,7 @@ function ProcessCard({
     <div className="sticky top-0 flex h-screen items-center">
       <motion.article
         style={{ scale, transformOrigin: "center top", marginTop: offset }}
-        className="relative w-full overflow-hidden rounded-xl border border-hair bg-[#0c0c0c] p-7 shadow-[0_-24px_60px_-30px_rgba(0,0,0,0.9)] md:p-12 lg:p-16"
+        className="relative w-full overflow-hidden rounded-xl border border-hair bg-surfaceUp p-7 shadow-[0_-24px_60px_-30px_rgba(0,0,0,0.9)] md:p-12 lg:p-16"
       >
         <span
           aria-hidden="true"

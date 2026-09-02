@@ -25,7 +25,7 @@ export function Intro() {
           <FitText
             text={aboutPage.title}
             style={{
-              backgroundImage: "linear-gradient(273deg, #ff8a00 0%, #fd321c 100%)",
+              backgroundImage: `linear-gradient(273deg, rgb(var(--c-accent-warm)) 0%, rgb(var(--c-accent)) 100%)`,
               WebkitBackgroundClip: "text",
               backgroundClip: "text",
               WebkitTextFillColor: "transparent",
@@ -40,7 +40,7 @@ export function Intro() {
               <RisingText text={aboutPage.lead} />
             </h2>
 
-            <p className="mt-7 max-w-[24ch] text-[clamp(1.6rem,3.05vw,2.75rem)] font-semibold uppercase leading-[1] tracking-tight text-white/35">
+            <p className="mt-7 max-w-[24ch] text-[clamp(1.6rem,3.05vw,2.75rem)] font-semibold uppercase leading-[1] tracking-tight text-paper/35">
               <RisingText text={aboutPage.secondary} />
             </p>
 
@@ -82,7 +82,7 @@ function Signature() {
         d="M16 40 C40 18 84 12 128 16 C100 52 70 88 40 122 C74 108 112 104 152 110
            C176 114 196 104 206 84 C212 70 202 60 192 68 C182 76 186 96 200 108
            C212 118 228 116 236 106"
-        stroke="#fd321c"
+        stroke="var(--accent)"
         strokeWidth="7"
         strokeLinecap="round"
         strokeLinejoin="round"

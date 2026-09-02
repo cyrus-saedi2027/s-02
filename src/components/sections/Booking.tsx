@@ -119,7 +119,7 @@ export function BookingDialog({ open, onClose }: { open: boolean; onClose: () =>
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.22, ease: "easeOut" }}
-            className="fixed inset-0 cursor-default bg-[#0a0a0c]/30"
+            className="fixed inset-0 cursor-default bg-glass/30"
             style={{
               backdropFilter: `blur(${GLASS_BLUR}px) saturate(${GLASS_SATURATE})`,
               WebkitBackdropFilter: `blur(${GLASS_BLUR}px) saturate(${GLASS_SATURATE})`,
@@ -748,8 +748,8 @@ function Calendar({
                   isSelected
                     ? "bg-paper font-semibold text-ink"
                     : open
-                      ? "bg-surfaceUp font-medium text-paper ring-1 ring-inset ring-white/10 hover:bg-hairStrong hover:ring-white/30"
-                      : "text-white/20",
+                      ? "bg-surfaceUp font-medium text-paper ring-1 ring-inset ring-paper/10 hover:bg-hairStrong hover:ring-paper/30"
+                      : "text-paper/20",
                   !inMonth && !isSelected && "opacity-50"
                 )}
               >

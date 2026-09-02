@@ -5,9 +5,59 @@
 @tailwind utilities;
 
 @layer base {
+  /* The palette, as RGB triplets so Tailwind's opacity modifiers still work
+     against them — `text-paper/80` resolves to rgb(var(--c-paper) / 0.8).
+     Everything the theme changes lives here and nowhere else; the components
+     name tokens and never a colour.
+
+     The dimmed tiers and the hairlines are alphas of the foreground rather
+     than colours of their own, so they invert with it: 14% of white on black
+     becomes 14% of near-black on off-white without a second definition. */
   :root {
     --shell-x: clamp(1.25rem, 4vw, 4.5rem);
     --accent: #fd321c;
+
+    --c-ink: 0 0 0;
+    --c-paper: 255 255 255;
+    --c-accent: 253 50 28;
+    --c-accent-warm: 255 138 0;
+    --c-surface: 10 10 10;
+    --c-surface-up: 17 17 17;
+    /* The glass the menu and the top band are made of. */
+    --c-glass: 6 6 8;
+
+    /* How far the dimmed tiers and the hairlines are pulled back from the
+       foreground. They are alphas rather than colours so they invert with the
+       theme — but the same alpha does not buy the same contrast in both
+       directions, so the numbers are per-theme too. */
+    --a-dim: 0.56;
+    --a-dimmer: 0.38;
+    --a-hair: 0.14;
+    --a-hair-strong: 0.28;
+    color-scheme: dark;
+  }
+
+  /* Light. Not white — an off-white that is easier to sit in front of — and a
+     slightly deeper accent, because #fd321c on white is thin at small sizes
+     where the same colour on black is not. */
+  :root[data-theme="light"] {
+    --c-ink: 246 244 240;
+    --c-paper: 12 12 14;
+    --c-accent: 214 38 12;
+    --c-accent-warm: 201 104 0;
+    --c-surface: 255 255 255;
+    --c-surface-up: 237 234 228;
+    --c-glass: 250 249 246;
+    --accent: #d6260c;
+
+    /* Stronger than the dark theme's. 56% of near-black on an off-white ground
+       measured 4.37:1, just under AA, where 56% of white on black is 6.48:1 —
+       the eye is more forgiving of light-on-dark and the numbers say so. */
+    --a-dim: 0.68;
+    --a-dimmer: 0.52;
+    --a-hair: 0.17;
+    --a-hair-strong: 0.32;
+    color-scheme: light;
   }
 
   * {
@@ -21,7 +71,7 @@
      half a second of full-bleed gradient every time the site was opened. The
      ramp belongs to the wipe alone, so it lives on ::view-transition now. */
   html {
-    background-color: theme("colors.ink");
+    background-color: rgb(var(--c-ink));
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     scroll-behavior: auto;

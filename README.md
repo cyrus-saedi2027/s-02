@@ -4,7 +4,8 @@ A dark editorial portfolio site built with Vite, React, TypeScript, Tailwind CSS
 and Framer Motion. Five pages — home, about, projects, playground and contact —
 heavy on scroll-driven motion, with a wipe between routes.
 
-Work in progress is tracked in [ROADMAP.md](ROADMAP.md).
+Dark by default with a light theme, sound and reduced motion all switchable
+from the footer. Work is tracked in [ROADMAP.md](ROADMAP.md).
 
 ## Running it
 
@@ -20,8 +21,8 @@ npm run preview  # serve the built bundle
 ```
 src/
   App.tsx                  routing, page transition, scroll and anchor handling
-  pages/                   Home, AboutPage, ProjectsPage, PlaygroundPage,
-                           ContactPage — one composition each
+  pages/                   Home, About, Projects, ProjectPage, Playground,
+                           Writing, NotePage, Contact, NotFound
   data/site.ts             all copy and content in one place
   hooks/
     useSmoothScroll.ts     lerp-based inertial wheel scrolling

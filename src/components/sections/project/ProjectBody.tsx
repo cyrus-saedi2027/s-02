@@ -23,7 +23,7 @@ export function ProjectProblem({ project }: { project: Project }) {
             <MaskLine>Before</MaskLine>
           </h2>
         </div>
-        <p className="text-[clamp(1.1rem,1.9vw,1.5rem)] font-medium leading-[1.5] text-white/80">
+        <p className="text-[clamp(1.1rem,1.9vw,1.5rem)] font-medium leading-[1.5] text-paper/80">
           <RisingText text={project.problem} stagger={0.006} />
         </p>
       </div>
@@ -125,7 +125,7 @@ export function ProjectOutcome({ project }: { project: Project }) {
         </div>
 
         <Reveal delay={0.1}>
-          <p className="mt-12 max-w-[54ch] text-[clamp(1.1rem,1.9vw,1.5rem)] font-medium leading-[1.5] text-white/80">
+          <p className="mt-12 max-w-[54ch] text-[clamp(1.1rem,1.9vw,1.5rem)] font-medium leading-[1.5] text-paper/80">
             {project.outcome}
           </p>
         </Reveal>
@@ -187,7 +187,7 @@ export function ProjectNext({ next }: { next: Project }) {
               className="mt-8 inline-flex select-none items-center overflow-hidden rounded-md px-8 py-[18px] font-sans text-2xs font-semibold uppercase tracking-wider text-paper"
               style={{
                 backgroundImage:
-                  "linear-gradient(135deg, #fd321c 0%, #ff8a00 100%)",
+                  `linear-gradient(135deg, rgb(var(--c-accent)) 0%, rgb(var(--c-accent-warm)) 100%)`,
               }}
             >
               View project
