@@ -17,15 +17,22 @@ These change what the site *says*, which is where the biggest gap is.
       nothing. Each page runs lede → the problem → the work in two or three
       chapters → three figures that count up → the next project.
 
-- [ ] **2. Real social links.** The four accounts in the footer and on the
-      contact page are `href="#"`. They no longer break the route (fixed in
-      `b61fa37`) but they still do nothing when clicked.
+- [x] **2. Real social links.** One `SocialLink` decides it now: a configured
+      `href` becomes a real link opened in a new tab, an empty one renders as
+      plain text. A name nobody has an account for reads as a fact rather than
+      as an offer, instead of a link that takes the click and does nothing.
+      **The four URLs in `socials` are still empty — fill one in and it turns
+      into a link with no other change.**
 
-- [ ] **3. A form that actually sends.** The contact form hands the composed
-      message to the visitor's mail client, because there is no server behind
-      this site. A real endpoint (Formspree, Resend, or a small function)
-      would close it properly. The booking panel has the same gap: it says a
-      time is held, and nothing is holding it.
+- [x] **3. A form that actually sends.** Set `VITE_CONTACT_ENDPOINT` (see
+      `.env.example`) and the form posts JSON to it, with sending, sent and
+      failed states, and a confirmation that says which of "sent" and "handed
+      to your mail app" actually happened. Unset, it keeps the mail-client
+      fallback — the single-file build can be opened from disk where there is
+      no server to post to. A honeypot field is parked off-screen.
+      **No endpoint is configured yet.** The booking panel still says a time is
+      held with nothing holding it; that needs a calendar, not a form endpoint,
+      and is its own piece of work.
 
 ## B — Motion and feel
 

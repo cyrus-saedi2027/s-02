@@ -3,7 +3,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Reveal } from "@/components/ui/Reveal";
 import { HoverStaggerLabel } from "@/components/ui/AnimatedText";
 import { MagneticButton } from "@/components/ui/MagneticButton";
+import { SocialLink } from "@/components/ui/SocialLink";
 import { contactPage, identity, socials } from "@/data/site";
+import { hasEndpoint, sendEnquiry } from "@/lib/sendEnquiry";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -76,17 +78,31 @@ function Invitation() {
 /**
  * The form.
  *
- * There is no server behind this site, so rather than pretend a message was
- * sent, submitting hands the composed note to the visitor's own mail client
- * and says so. That way the message actually reaches somebody.
+ * Where it sends is configuration, not a decision baked in here: with
+ * `VITE_CONTACT_ENDPOINT` set it posts, and without it the composed message
+ * goes to the visitor's own mail client. The confirmation says which of the
+ * two happened, because "sent" and "ready to send in your mail app" ask
+ * different things of the reader and telling them apart is the difference
+ * between a form that works and one that only looks like it does.
  */
 function EnquiryForm() {
-  const [sent, setSent] = useState(false);
+  const [state, setState] = useState<"idle" | "sending" | "sent">("idle");
+  const [via, setVia] = useState<"endpoint" | "mail">("mail");
   const [error, setError] = useState<string | null>(null);
 
-  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (state === "sending") return;
+
     const data = new FormData(e.currentTarget);
+    // A field no person can see and no person fills in. A bot fills in
+    // everything, so anything in here means the submission is not from a
+    // reader — accepted silently, so whatever filled it learns nothing.
+    if (String(data.get("company") ?? "").trim()) {
+      setState("sent");
+      return;
+    }
+
     const name = String(data.get("name") ?? "").trim();
     const email = String(data.get("email") ?? "").trim();
     const message = String(data.get("message") ?? "").trim();
@@ -101,33 +117,43 @@ function EnquiryForm() {
     }
 
     setError(null);
-    const body = `${message}\n\n— ${name} (${email})`;
-    window.location.href =
-      `mailto:${identity.email}` +
-      `?subject=${encodeURIComponent(`Project enquiry from ${name}`)}` +
-      `&body=${encodeURIComponent(body)}`;
-    setSent(true);
+    setState("sending");
+    try {
+      const result = await sendEnquiry({ name, email, message });
+      setVia(result.via);
+      setState("sent");
+    } catch (err) {
+      setState("idle");
+      setError(
+        err instanceof Error
+          ? `${err.message} Write to ${identity.email} instead and it will reach me.`
+          : `Something went wrong. Write to ${identity.email} instead.`
+      );
+    }
   };
 
   return (
     <AnimatePresence mode="wait" initial={false}>
-      {sent ? (
+      {state === "sent" ? (
         <motion.div
           key="sent"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: EASE }}
           className="rounded-[10px] border border-hair bg-white/[0.03] p-8"
+          role="status"
         >
-          <p className="text-lg font-medium">Your message is ready to send.</p>
+          <p className="text-lg font-medium">
+            {via === "endpoint" ? "Message sent." : "Your message is ready to send."}
+          </p>
           <p className="mt-3 max-w-[46ch] font-sans text-sm leading-relaxed text-dim">
-            It has been handed to your mail app, addressed to {identity.email}.
-            Nothing leaves this page on its own — press send there and it is on
-            its way.
+            {via === "endpoint"
+              ? `It is with me now. I answer everything within a day or two — if you do not hear back, ${identity.email} reaches me directly.`
+              : `It has been handed to your mail app, addressed to ${identity.email}. Nothing leaves this page on its own — press send there and it is on its way.`}
           </p>
           <button
             type="button"
-            onClick={() => setSent(false)}
+            onClick={() => setState("idle")}
             className="mt-6 font-sans text-2xs font-semibold uppercase tracking-wider text-accent"
           >
             Write another
@@ -147,6 +173,23 @@ function EnquiryForm() {
           <Field name="email" label="Your Email*" type="email" autoComplete="email" />
           <Field name="message" label="Your Message*" textarea />
 
+          {/* The honeypot: parked off-screen rather than hidden with
+              `display: none`, which the cruder bots know to skip. Out of the
+              tab order and out of the accessibility tree, so nobody reading
+              the page in any way is offered it. */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -left-[9999px] top-0 h-0 w-0 overflow-hidden"
+          >
+            <input
+              name="company"
+              type="text"
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+            />
+          </div>
+
           {error && (
             <p role="alert" className="font-sans text-xs text-accent">
               {error}
@@ -154,8 +197,20 @@ function EnquiryForm() {
           )}
 
           <div className="pt-[10px]">
-            <MagneticButton label="Send message" type="submit" variant="accent" />
+            <MagneticButton
+              label={state === "sending" ? "Sending" : "Send message"}
+              type="submit"
+              disabled={state === "sending"}
+              variant="accent"
+            />
           </div>
+
+          {!hasEndpoint() && (
+            <p className="font-sans text-2xs leading-relaxed text-dimmer">
+              This form opens your mail app. Set VITE_CONTACT_ENDPOINT to post
+              it instead.
+            </p>
+          )}
         </motion.form>
       )}
     </AnimatePresence>
@@ -255,14 +310,10 @@ function Details() {
       <ul className="flex flex-col gap-[5px] sm:w-1/2">
         {socials.map((s) => (
           <li key={s.label}>
-            <a
-              href={s.href}
-              onMouseEnter={() => setHover(s.label)}
-              onMouseLeave={() => setHover(null)}
-              className="inline-flex text-[clamp(2rem,3.2vw,2.75rem)] font-bold uppercase leading-[1.1] tracking-tight transition-colors duration-300 hover:text-accent"
-            >
-              <HoverStaggerLabel text={s.label} active={hover === s.label} />
-            </a>
+            <SocialLink
+              social={s}
+              className="text-[clamp(2rem,3.2vw,2.75rem)] font-bold uppercase leading-[1.1] tracking-tight"
+            />
           </li>
         ))}
       </ul>

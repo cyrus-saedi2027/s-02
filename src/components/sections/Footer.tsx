@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Reveal } from "../ui/Reveal";
 import { HoverStaggerLabel } from "../ui/AnimatedText";
+import { SocialLink } from "../ui/SocialLink";
 import { identity, navLinks, socials } from "@/data/site";
 
 export function Footer() {
@@ -64,14 +65,10 @@ export function Footer() {
             <ul className="flex flex-col gap-3">
               {socials.map((s) => (
                 <li key={s.label}>
-                  <a
-                    href={s.href}
-                    onMouseEnter={() => setHover(s.label)}
-                    onMouseLeave={() => setHover(null)}
-                    className="inline-flex font-sans text-sm font-medium uppercase tracking-wide transition-colors duration-300 hover:text-accent"
-                  >
-                    <HoverStaggerLabel text={s.label} active={hover === s.label} />
-                  </a>
+                  <SocialLink
+                    social={s}
+                    className="font-sans text-sm font-medium uppercase tracking-wide"
+                  />
                 </li>
               ))}
             </ul>

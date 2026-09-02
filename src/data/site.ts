@@ -523,11 +523,22 @@ export const navLinks = [
   { label: "Playground", href: "/playground" },
   { label: "Contact", href: "/contact" },
 ];
-export const socials = [
-  { label: "Instagram", href: "#" },
-  { label: "Twitter", href: "#" },
-  { label: "LinkedIn", href: "#" },
-  { label: "Dribbble", href: "#" },
+/**
+ * Where to find the studio elsewhere.
+ *
+ * `href` is the whole configuration: fill one in and it becomes a link that
+ * opens in a new tab; leave it empty and the name is rendered as plain text
+ * instead. That is deliberate — an account nobody has set up yet should read
+ * as "not on this platform", not as a link that swallows the click. These are
+ * empty until real accounts exist to point at.
+ */
+export type Social = { label: string; href: string };
+
+export const socials: Social[] = [
+  { label: "Instagram", href: "" },
+  { label: "Twitter", href: "" },
+  { label: "LinkedIn", href: "" },
+  { label: "Dribbble", href: "" },
 ];
 
 /**
