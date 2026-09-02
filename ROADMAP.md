@@ -59,13 +59,21 @@ These change what the site *says*, which is where the biggest gap is.
       change you can measure and not one you can see. Measured: 43px and 6° on
       a project plate, 11px and 9° on a wall tile, 0 under reduced motion.
 
-- [ ] **7. Sound, off by default.** A soft click on the menu and a low sweep on
-      the page change, behind a control the visitor turns on.
+- [x] **7. Sound, off by default.** Two synthesised voices — a tick when the
+      menu opens or closes, a low sweep under the page wipe — behind a switch
+      in the footer that shows its own state and remembers the choice. Web
+      Audio rather than two clips: everything else here is generated, and the
+      single-file build would have had to inline audio most visitors never
+      turn on. Verified silent until switched on.
 
 ## C — Technical
 
-- [ ] **8. Split the routes.** All 434 kB of JavaScript loads at once, so the
-      home page parses the code for four pages nobody has asked for yet.
+- [x] **8. Split the routes.** The home page now loads one 395 kB file
+      (128 kB gzipped), down from 455 kB (144 kB). Every other page is a chunk
+      fetched on the click that opens it, and so is the booking panel — 36 kB
+      of scheduler nobody sees until they ask for one. `SINGLE_FILE=1` puts it
+      all back into one chunk for the standalone build, which has no server to
+      fetch from.
 
 - [ ] **9. Font metric overrides** (`size-adjust` on a fallback face). Lab CLS
       on `/about` is 0.22, almost all of it one font swap. *No visitor sees

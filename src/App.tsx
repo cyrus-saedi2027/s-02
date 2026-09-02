@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { Suspense, lazy, useCallback, useEffect, useState } from "react";
 import { flushSync } from "react-dom";
 import { MotionConfig } from "framer-motion";
 import { HashRouter, Route, Routes, useLocation, useNavigate } from "react-router-dom";
@@ -9,16 +9,45 @@ import { ScrollProgress } from "./components/ui/ScrollProgress";
 import { TopGlass } from "./components/ui/TopGlass";
 import { Header } from "./components/Header";
 import { MenuOverlay } from "./components/MenuOverlay";
-import { BookingDialog } from "./components/sections/Booking";
 import { Footer } from "./components/sections/Footer";
 import { ClosingMark } from "./components/sections/ClosingMark";
 
 import Home from "./pages/Home";
-import AboutPage from "./pages/AboutPage";
-import ProjectsPage from "./pages/ProjectsPage";
-import PlaygroundPage from "./pages/PlaygroundPage";
-import ContactPage from "./pages/ContactPage";
-import ProjectPage from "./pages/ProjectPage";
+
+/**
+ * Every page but the home page is fetched when it is first asked for.
+ *
+ * The whole site used to arrive as one bundle, so opening the home page paid
+ * to parse four other pages and seven case studies nobody had asked to see.
+ *
+ * The import functions are kept beside the lazy components on purpose: the
+ * click handler calls one directly before starting a transition. Left to
+ * Suspense, the view transition would snapshot the fallback — the API captures
+ * the new state the moment the commit returns, and a chunk still in flight
+ * means what it captures is an empty page rather than the one arriving.
+ */
+const load = {
+  "/about": () => import("./pages/AboutPage"),
+  "/projects": () => import("./pages/ProjectsPage"),
+  "/playground": () => import("./pages/PlaygroundPage"),
+  "/contact": () => import("./pages/ContactPage"),
+  project: () => import("./pages/ProjectPage"),
+};
+
+/**
+ * The booking panel is the largest thing on the site and nobody sees it until
+ * they ask for one — a scheduler, a month of dates, a timezone table. It is
+ * fetched on the click that opens it.
+ */
+const BookingDialog = lazy(() =>
+  import("./components/sections/Booking").then((m) => ({ default: m.BookingDialog }))
+);
+
+const AboutPage = lazy(load["/about"]);
+const ProjectsPage = lazy(load["/projects"]);
+const PlaygroundPage = lazy(load["/playground"]);
+const ContactPage = lazy(load["/contact"]);
+const ProjectPage = lazy(load.project);
 
 import { useSmoothScroll } from "./hooks/useSmoothScroll";
 import { withPageTransition } from "./lib/pageTransition";
@@ -37,6 +66,10 @@ const ROUTES = ["/", "/about", "/projects", "/playground", "/contact"];
 const PROJECT_PATH = /^\/projects\/([a-z0-9-]+)$/;
 const isSiteRoute = (path: string) =>
   ROUTES.includes(path) || PROJECT_PATH.test(path);
+
+/** The chunk a path needs, or undefined for one already here. */
+const chunkFor = (path: string) =>
+  PROJECT_PATH.test(path) ? load.project : load[path as keyof typeof load];
 
 /**
  * The plate on this page for `slug`, if the visitor can see it.
@@ -167,28 +200,40 @@ function Shell() {
         return;
       }
 
-      // Going to a project page, the plate that was clicked travels with you.
-      const cover = visibleCover(path.match(PROJECT_PATH)?.[1] ?? "");
-      if (cover) cover.style.viewTransitionName = "project-cover";
+      const go = () => {
+        // Going to a project page, the plate that was clicked travels with you.
+        const cover = visibleCover(path.match(PROJECT_PATH)?.[1] ?? "");
+        if (cover) cover.style.viewTransitionName = "project-cover";
 
-      withPageTransition(
-        () => {
-          // flushSync so the new page is committed before the API snapshots it.
-          flushSync(() => navigate(path + url.hash));
-          // And put it at the top here rather than in the effect below, which
-          // does not run until after the snapshot. Left to the effect, the new
-          // page was captured still sitting at the old page's offset: the wipe
-          // covered that, but the travelling cover did not — it was measured
-          // against a hero that had not reached its resting place, so the
-          // plate stopped short of where it was going.
-          if (!url.hash) window.scrollTo(0, 0);
-        },
-        () => {
-          // Hand the name back: two elements wearing it at once is invalid and
-          // the browser drops the transition entirely.
-          if (cover) cover.style.viewTransitionName = "";
-        }
-      );
+        withPageTransition(
+          () => {
+            // flushSync so the new page is committed before the API snapshots
+            // it. And the page goes to the top here rather than in the effect
+            // below, which does not run until after the snapshot. Left to the
+            // effect, the new page was captured still sitting at the old
+            // page's offset: the wipe covered that, but the travelling cover
+            // did not — it was measured against a hero that had not reached
+            // its resting place, so the plate stopped short of where it was
+            // going.
+            flushSync(() => navigate(path + url.hash));
+            if (!url.hash) window.scrollTo(0, 0);
+          },
+          () => {
+            // Hand the name back: two elements wearing it at once is invalid
+            // and the browser drops the transition entirely.
+            if (cover) cover.style.viewTransitionName = "";
+          }
+        );
+      };
+
+      // Have the page in hand before the wipe starts, so the transition
+      // snapshots the page and not a Suspense fallback: the API captures the
+      // new state the moment the commit returns, and a chunk still in flight
+      // means what it captures is an empty page. An already-loaded chunk
+      // resolves from cache, so a second visit to a route pays nothing.
+      const chunk = chunkFor(path);
+      if (chunk) void chunk().then(go);
+      else go();
     };
 
     document.addEventListener("click", onClick);
@@ -228,22 +273,36 @@ function Shell() {
         onMenu={() => setMenuOpen((v) => !v)}
       />
       <MenuOverlay open={menuOpen} onClose={() => setMenuOpen(false)} />
-      <BookingDialog open={bookingOpen} onClose={() => setBookingOpen(false)} />
+      {/* Not mounted at all until it is wanted, so its chunk is not fetched
+          either. No fallback: there is nothing on screen to hold a place for,
+          and the panel arriving a beat late reads as it opening. */}
+      {bookingOpen && (
+        <Suspense fallback={null}>
+          <BookingDialog open onClose={() => setBookingOpen(false)} />
+        </Suspense>
+      )}
 
       {/* The page body is opaque and rides above the closing wordmark, which
           is pinned to the bottom of the viewport behind it. Scrolling to the
           end slides this block up off the strip and uncovers it. */}
       <div className="relative z-10 bg-ink">
-        <Routes>
-          <Route path="/" element={<Home ready={ready} onBook={openBooking} />} />
-          <Route path="/about" element={<AboutPage onBook={openBooking} />} />
-          <Route path="/projects" element={<ProjectsPage onBook={openBooking} />} />
-          <Route path="/projects/:slug" element={<ProjectPage onBook={openBooking} />} />
-          <Route path="/playground" element={<PlaygroundPage onBook={openBooking} />} />
-          <Route path="/contact" element={<ContactPage onBook={openBooking} />} />
-          {/* Anything unrecognised falls back to the home page. */}
-          <Route path="*" element={<Home ready={ready} onBook={openBooking} />} />
-        </Routes>
+        {/* One screen of nothing rather than a spinner. A route change is
+            already covered by the wipe, and on a cold load of a deep link the
+            preloader is still up — so this is only ever seen if a chunk is
+            genuinely slow, where a blank hold reads better than a flash of
+            loading furniture. */}
+        <Suspense fallback={<div className="min-h-screen" />}>
+          <Routes>
+            <Route path="/" element={<Home ready={ready} onBook={openBooking} />} />
+            <Route path="/about" element={<AboutPage onBook={openBooking} />} />
+            <Route path="/projects" element={<ProjectsPage onBook={openBooking} />} />
+            <Route path="/projects/:slug" element={<ProjectPage onBook={openBooking} />} />
+            <Route path="/playground" element={<PlaygroundPage onBook={openBooking} />} />
+            <Route path="/contact" element={<ContactPage onBook={openBooking} />} />
+            {/* Anything unrecognised falls back to the home page. */}
+            <Route path="*" element={<Home ready={ready} onBook={openBooking} />} />
+          </Routes>
+        </Suspense>
 
         <Footer />
       </div>

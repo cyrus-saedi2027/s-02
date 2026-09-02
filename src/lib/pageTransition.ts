@@ -24,6 +24,8 @@
  * half-built imitation of a wipe reads worse than a clean cut.
  */
 
+import { playTransition } from "./sound";
+
 const canAnimate = () =>
   typeof document !== "undefined" &&
   typeof (document as Document & { startViewTransition?: unknown })
@@ -55,6 +57,8 @@ export function withPageTransition(commit: () => void, done?: () => void) {
 
   const doc = document as Document & { startViewTransition: StartViewTransition };
   document.documentElement.dataset.pageTransition = "true";
+  // Under the wipe, not over it — it is silent unless the visitor asked.
+  playTransition();
 
   const vt = doc.startViewTransition(() => {
     commit();

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { navLinks } from "@/data/site";
 import { GLASS_BLUR, GLASS_GRAIN, GLASS_GRAIN_OPACITY, GLASS_SATURATE } from "@/lib/glass";
+import { playMenu } from "@/lib/sound";
 
 const EASE = [0.76, 0, 0.24, 1] as const;
 
@@ -40,6 +41,12 @@ export function MenuOverlay({
    * What matters is that a keyboard visitor who opens the menu starts inside it
    * rather than on <body>, several tabs away from the thing they just opened.
    */
+  // Both directions, so the panel sounds like one object rather than
+  // announcing itself and then leaving in silence.
+  useEffect(() => {
+    playMenu(open);
+  }, [open]);
+
   useEffect(() => {
     if (!open) return;
     restoreTo.current = document.activeElement;
