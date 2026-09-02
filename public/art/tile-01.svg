@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 640" width="900" height="640" role="img">
+
+  <defs>
+    <radialGradient id="bloomtile01svg">
+      <stop offset="0" stop-color="#ff8a00" stop-opacity="0.95"/>
+      <stop offset="0.45" stop-color="#fd321c" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#fd321c" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="sweeptile01svg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8f1405"/>
+      <stop offset="0.55" stop-color="#fd321c"/>
+      <stop offset="1" stop-color="#ff8a00"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="640" fill="#0a0a0b"/>
+<rect width="900" height="640" fill="#111114"/><ellipse cx="395.3" cy="252.8" rx="495" ry="288" fill="url(#bloomtile01svg)" opacity="0.5"/><rect x="45" y="45" width="810" height="35.2" rx="7.7" fill="#fff" opacity="0.07"/><circle cx="59.1" cy="62.6" r="4.5" fill="#fff" opacity="0.2"/><circle cx="75.7" cy="62.6" r="4.5" fill="#fff" opacity="0.2"/><circle cx="92.4" cy="62.6" r="4.5" fill="#fff" opacity="0.2"/><rect x="45" y="93" width="810" height="238.9" rx="9" fill="url(#sweeptile01svg)" opacity="0.5"/><rect x="81" y="164.7" width="378" height="22.4" rx="3" fill="#fff" opacity="0.7"/><rect x="81" y="200.5" width="270" height="11.5" rx="3" fill="#fff" opacity="0.32"/><rect x="45" y="354.3" width="255" height="141.9" rx="7.7" fill="#fff" opacity="0.105"/><rect x="70.5" y="442.3" width="140.3" height="9" rx="2" fill="#fff" opacity="0.3"/><rect x="322.5" y="354.3" width="255" height="144.3" rx="7.7" fill="#fff" opacity="0.082"/><rect x="348" y="443.8" width="140.3" height="9" rx="2" fill="#fd321c" opacity="0.8"/><rect x="600" y="354.3" width="255" height="102.3" rx="7.7" fill="#fff" opacity="0.096"/><rect x="625.5" y="417.8" width="140.3" height="9" rx="2" fill="#fff" opacity="0.3"/><rect x="45" y="533.5" width="729" height="7.7" rx="2" fill="#fff" opacity="0.140"/><rect x="45" y="555.9" width="599.4" height="7.7" rx="2" fill="#fff" opacity="0.115"/><rect x="45" y="578.3" width="469.8" height="7.7" rx="2" fill="#fff" opacity="0.090"/>
+</svg>

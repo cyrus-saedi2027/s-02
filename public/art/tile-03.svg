@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" width="900" height="620" role="img">
+
+  <defs>
+    <radialGradient id="bloomtile03svg">
+      <stop offset="0" stop-color="#ff8a00" stop-opacity="0.95"/>
+      <stop offset="0.45" stop-color="#fd321c" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#fd321c" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="sweeptile03svg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8f1405"/>
+      <stop offset="0.55" stop-color="#fd321c"/>
+      <stop offset="1" stop-color="#ff8a00"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="620" fill="#0a0a0b"/>
+<rect width="900" height="620" fill="#0d0d10"/><ellipse cx="242.4" cy="447.3" rx="450" ry="248" fill="url(#bloomtile03svg)" opacity="0.72"/><text x="357.5" y="573.9" font-family="Poppins, Inter, sans-serif" font-weight="700" font-size="1185.1" fill="#fff" opacity="0.9" letter-spacing="-0.06em">N</text><rect width="900" height="620" fill="url(#sweeptile03svg)" opacity="0.16" style="mix-blend-mode:overlay"/>
+</svg>

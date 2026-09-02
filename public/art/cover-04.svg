@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="1200" height="800" role="img">
+
+  <defs>
+    <radialGradient id="bloomcover04svg">
+      <stop offset="0" stop-color="#ff8a00" stop-opacity="0.95"/>
+      <stop offset="0.45" stop-color="#fd321c" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#fd321c" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="sweepcover04svg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8f1405"/>
+      <stop offset="0.55" stop-color="#fd321c"/>
+      <stop offset="1" stop-color="#ff8a00"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="800" fill="#0a0a0b"/>
+<rect width="1200" height="800" fill="#0d0d10"/><ellipse cx="381.7" cy="471.2" rx="600" ry="320" fill="url(#bloomcover04svg)" opacity="0.72"/><text x="413.1" y="695.1" font-family="Poppins, Inter, sans-serif" font-weight="700" font-size="1599.3" fill="#fff" opacity="0.9" letter-spacing="-0.06em">M</text><rect width="1200" height="800" fill="url(#sweepcover04svg)" opacity="0.16" style="mix-blend-mode:overlay"/>
+</svg>

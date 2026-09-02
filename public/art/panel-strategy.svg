@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 760" width="600" height="760" role="img">
+
+  <defs>
+    <radialGradient id="bloompanelstrategysvg">
+      <stop offset="0" stop-color="#ff8a00" stop-opacity="0.95"/>
+      <stop offset="0.45" stop-color="#fd321c" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#fd321c" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="sweeppanelstrategysvg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8f1405"/>
+      <stop offset="0.55" stop-color="#fd321c"/>
+      <stop offset="1" stop-color="#ff8a00"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="760" fill="#0a0a0b"/>
+<rect width="600" height="760" fill="#0b0b0e"/><ellipse cx="337.1" cy="526.6" rx="240" ry="266" fill="url(#bloompanelstrategysvg)" opacity="0.6"/><rect x="326.1" y="136.2" width="284.2" height="284.2" rx="22.7" fill="#ff8a00" opacity="0.17" transform="rotate(1.4 468.2 278.3)"/><rect x="162.1" y="377.3" width="251.9" height="251.9" rx="20.2" fill="#ff8a00" opacity="0.36" transform="rotate(23 288 503.3)"/><path d="M 353.7 190.2 L 464.7 412.3 L 242.6 412.3 Z" fill="#fd321c" opacity="0.39"/><rect x="139.9" y="424.8" width="138.4" height="138.4" rx="11.1" fill="#fff" opacity="0.38" transform="rotate(6.5 209.1 493.9)"/><path d="M 235.3 151.3 L 387.6 455.9 L 83 455.9 Z" fill="#fff" opacity="0.23"/><circle cx="402.6" cy="185.4" r="147.2" fill="#fff" opacity="0.18"/>
+</svg>

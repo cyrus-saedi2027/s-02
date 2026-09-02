@@ -1,0 +1,265 @@
+@import "./fonts.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --shell-x: clamp(1.25rem, 4vw, 4.5rem);
+    --accent: #fd321c;
+  }
+
+  * {
+    @apply border-hair;
+  }
+
+  /* The page ground stays black.
+     It carried the accent ramp for a while, so that the page-to-page wipe would
+     uncover it — but the ground is also what is on screen from the very first
+     paint, well before React has mounted anything over it, and that showed as
+     half a second of full-bleed gradient every time the site was opened. The
+     ramp belongs to the wipe alone, so it lives on ::view-transition now. */
+  html {
+    background-color: theme("colors.ink");
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: auto;
+  }
+
+  body {
+    @apply bg-ink text-paper font-display antialiased;
+    margin: 0;
+    overflow-x: hidden;
+    font-feature-settings: "kern" 1, "liga" 1;
+  }
+
+  /* The custom cursor replaces the pointer on fine-pointer devices only. */
+  @media (pointer: fine) {
+    body.has-custom-cursor,
+    body.has-custom-cursor * {
+      cursor: none !important;
+    }
+  }
+
+  ::selection {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  ::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #000;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.18);
+    border-radius: 99px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.32);
+  }
+
+  /* Lock the page while the preloader or a dialog is up. Overflow only: the
+     document keeps its height, so the offset behind the layer survives. See
+     src/lib/scrollLock.ts. */
+  html[data-locked="true"] {
+    overflow: hidden;
+  }
+
+  /* A dialog's glass is a full-viewport backdrop filter, and the grain drifts
+     several times a second — which invalidates that backdrop and forces the
+     whole viewport to be re-blurred on every step. Hold it still meanwhile. */
+  html[data-locked="true"] .grain::after {
+    animation: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Page-to-page wipe
+ *
+ * Read src/lib/pageTransition.ts first — it carries the numbers and why they
+ * are what they are. In short: the old page lifts away and is masked off from
+ * the bottom edge up; half a second later the new one rises back into place
+ * the same way, and the accent ground shows between them.
+ *
+ * These rules sit outside @layer so they always outrank Tailwind's utilities;
+ * the pseudo-elements are outside the document tree, and a layered rule can
+ * lose to a utility class that happens to match on the captured root.
+ * ------------------------------------------------------------------------- */
+
+/* The mask edge is driven by a custom property, which has to be registered to
+   be interpolable — unregistered, it would flip from 0 to 1 mid-animation
+   instead of sweeping. */
+@property --vt-wipe {
+  syntax: "<number>";
+  initial-value: 0;
+  inherits: false;
+}
+
+@keyframes vt-exit {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+    --vt-wipe: 0;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-30%);
+    --vt-wipe: 1;
+  }
+}
+
+@keyframes vt-enter {
+  from {
+    opacity: 0;
+    transform: translateY(30%);
+    --vt-wipe: 0;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    --vt-wipe: 1;
+  }
+}
+
+/* What shows between the two pages.
+   The page ground below would otherwise be the thing uncovered, but the
+   transition tree is painted over the canvas and only the root's background
+   *colour* survives that — the gradient does not — so the ramp is painted here,
+   on the root of the transition tree, where it is unambiguously behind both
+   snapshots and sized to the viewport. */
+::view-transition {
+  background: linear-gradient(
+    134deg,
+    theme("colors.accent.DEFAULT") 0%,
+    theme("colors.accent.warm") 100%
+  );
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  /* The default plus-lighter blend would brighten the overlap into pink where
+     the two pages cross. */
+  mix-blend-mode: normal;
+  backface-visibility: hidden;
+}
+
+::view-transition-old(root) {
+  animation: vt-exit 1s cubic-bezier(0.73, 0, 0.33, 1) 0s both;
+  /* 0deg puts the gradient's 0% at the bottom edge: below the edge is clear,
+     above it is kept, so the page is taken away from the bottom up. */
+  -webkit-mask-image: linear-gradient(
+    0deg,
+    transparent calc(100% * var(--vt-wipe)),
+    #000 calc(100% * var(--vt-wipe))
+  );
+  mask-image: linear-gradient(
+    0deg,
+    transparent calc(100% * var(--vt-wipe)),
+    #000 calc(100% * var(--vt-wipe))
+  );
+}
+
+::view-transition-new(root) {
+  animation: vt-enter 1s cubic-bezier(0.73, 0, 0.33, 1) 0.5s both;
+  /* The same edge, inverted, so the arriving page is uncovered from the bottom. */
+  -webkit-mask-image: linear-gradient(
+    0deg,
+    #000 calc(100% * var(--vt-wipe)),
+    transparent calc(100% * var(--vt-wipe))
+  );
+  mask-image: linear-gradient(
+    0deg,
+    #000 calc(100% * var(--vt-wipe)),
+    transparent calc(100% * var(--vt-wipe))
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* The custom cursor is drawn in the page, so it would be captured into the
+   outgoing snapshot and left hanging in mid-air for a second and a half. */
+html[data-page-transition="true"] .site-cursor {
+  opacity: 0 !important;
+}
+
+@layer components {
+  .shell {
+    padding-inline: var(--shell-x);
+    margin-inline: auto;
+    width: 100%;
+    max-width: theme("maxWidth.shell");
+  }
+
+  /* Small all-caps eyebrow used above every section title. */
+  .eyebrow {
+    @apply flex items-center gap-3 text-2xs uppercase tracking-wider text-dim font-sans font-medium;
+  }
+
+  .rule {
+    @apply h-px w-full bg-hair;
+  }
+
+  /* Fine grain laid over the whole page — keeps the flat black from banding. */
+  /* The overhang only has to cover the drift below, which is ~3.4% of the
+     viewport — at -50% this was a 2x2-viewport layer, four times the pixels
+     for the same effect, re-composited several times a second. */
+  .grain::after {
+    content: "";
+    position: fixed;
+    inset: -6%;
+    z-index: 60;
+    pointer-events: none;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation: grainShift 0.7s steps(3) infinite;
+  }
+
+  @keyframes grainShift {
+    0% { transform: translate(0, 0); }
+    33% { transform: translate(-3%, 2%); }
+    66% { transform: translate(2%, -3%); }
+    100% { transform: translate(0, 0); }
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Masks a line of type so children can slide up from behind it.
+     The padding/margin pair extends the mask below the baseline so descenders
+     (g, y, p) are not shaved off, without changing layout spacing. */
+  .clip-line {
+    overflow: hidden;
+    display: block;
+    padding-bottom: 0.16em;
+    margin-bottom: -0.16em;
+  }
+
+  .edge-fade-x {
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+    mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1350 1157" width="1350" height="1157" role="img">
+
+  <defs>
+    <radialGradient id="bloomplay05svg">
+      <stop offset="0" stop-color="#ff8a00" stop-opacity="0.95"/>
+      <stop offset="0.45" stop-color="#fd321c" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#fd321c" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="sweepplay05svg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8f1405"/>
+      <stop offset="0.55" stop-color="#fd321c"/>
+      <stop offset="1" stop-color="#ff8a00"/>
+    </linearGradient>
+  </defs>
+  <rect width="1350" height="1157" fill="#0a0a0b"/>
+<rect width="1350" height="1157" fill="#0d0d10"/><ellipse cx="459.5" cy="952.6" rx="675" ry="462.8" fill="url(#bloomplay05svg)" opacity="0.72"/><text x="495.8" y="1029.5" font-family="Poppins, Inter, sans-serif" font-weight="700" font-size="1789.5" fill="#fff" opacity="0.9" letter-spacing="-0.06em">R</text><rect width="1350" height="1157" fill="url(#sweepplay05svg)" opacity="0.16" style="mix-blend-mode:overlay"/>
+</svg>

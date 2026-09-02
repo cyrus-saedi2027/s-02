@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="1200" height="800" role="img">
+
+  <defs>
+    <radialGradient id="bloomcover06svg">
+      <stop offset="0" stop-color="#ff8a00" stop-opacity="0.95"/>
+      <stop offset="0.45" stop-color="#fd321c" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#fd321c" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="sweepcover06svg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8f1405"/>
+      <stop offset="0.55" stop-color="#fd321c"/>
+      <stop offset="1" stop-color="#ff8a00"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="800" fill="#0a0a0b"/>
+<rect width="1200" height="800" fill="#0b0b0e"/><ellipse cx="601.1" cy="405.5" rx="480" ry="280" fill="url(#bloomcover06svg)" opacity="0.6"/><circle cx="180.4" cy="493.1" r="170.1" fill="#ff8a00" opacity="0.39"/><circle cx="440.7" cy="107.3" r="186.4" fill="#ff8a00" opacity="0.33"/><path d="M 657.7 404.2 L 890.6 870.1 L 424.7 870.1 Z" fill="#fd321c" opacity="0.32"/><rect x="384" y="69.1" width="304" height="304" rx="24.3" fill="#ff8a00" opacity="0.23" transform="rotate(12.4 536 221.1)"/><rect x="463" y="442.7" width="368.5" height="368.5" rx="29.5" fill="#fd321c" opacity="0.20" transform="rotate(8.1 647.2 626.9)"/><path d="M 206.8 319.3 L 335.4 576.5 L 78.2 576.5 Z" fill="#fd321c" opacity="0.16"/>
+</svg>

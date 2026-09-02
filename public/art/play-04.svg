@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 687" width="900" height="687" role="img">
+
+  <defs>
+    <radialGradient id="bloomplay04svg">
+      <stop offset="0" stop-color="#ff8a00" stop-opacity="0.95"/>
+      <stop offset="0.45" stop-color="#fd321c" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#fd321c" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="sweepplay04svg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8f1405"/>
+      <stop offset="0.55" stop-color="#fd321c"/>
+      <stop offset="1" stop-color="#ff8a00"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="687" fill="#0a0a0b"/>
+<rect width="900" height="687" fill="#0b0b0e"/><ellipse cx="406.3" cy="316.9" rx="360" ry="240.4" fill="url(#bloomplay04svg)" opacity="0.6"/><circle cx="519.8" cy="109" r="154.8" fill="#ff8a00" opacity="0.32"/><path d="M 466.1 55.4 L 614.1 351.3 L 318.2 351.3 Z" fill="#ff8a00" opacity="0.24"/><path d="M 643.2 308.6 L 752.7 527.6 L 533.8 527.6 Z" fill="#fff" opacity="0.30"/><circle cx="400.5" cy="519.8" r="121.3" fill="#fff" opacity="0.26"/><rect x="159" y="351.4" width="222.9" height="222.9" rx="17.8" fill="#fd321c" opacity="0.31" transform="rotate(32.2 270.4 462.8)"/><path d="M 625.1 325.6 L 720.3 515.9 L 529.9 515.9 Z" fill="#fd321c" opacity="0.17"/>
+</svg>
