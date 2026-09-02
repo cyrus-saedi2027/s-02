@@ -6,7 +6,7 @@ import { Reveal } from "@/components/ui/Reveal";
 import { MagneticButton } from "@/components/ui/MagneticButton";
 import { CTA } from "@/components/sections/CTA";
 import NotFound from "./NotFound";
-import { longDate } from "./WritingPage";
+import { longDate } from "@/lib/date";
 import { notes } from "@/data/site";
 
 const EASE = [0.22, 1, 0.36, 1] as const;

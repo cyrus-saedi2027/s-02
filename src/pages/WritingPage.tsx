@@ -1,19 +1,10 @@
 import { motion } from "framer-motion";
 import { PageMasthead } from "@/components/sections/PageMasthead";
 import { CTA } from "@/components/sections/CTA";
+import { longDate } from "@/lib/date";
 import { notes } from "@/data/site";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
-
-/** "2025-11-04" as "4 November 2025", without pulling in a date library. */
-export function longDate(iso: string) {
-  return new Date(iso + "T00:00:00Z").toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    timeZone: "UTC",
-  });
-}
 
 /**
  * The index of notes.
