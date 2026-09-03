@@ -17,9 +17,17 @@ export function MagneticButton({
   onClick,
   type,
   disabled,
+  describedAs,
 }: {
   label: string;
   href?: string;
+  /**
+   * The name assistive tech should hear, when the visible label is not enough
+   * on its own. Four rows each offering "View project" are four identical
+   * links in a screen reader's list with nothing to tell them apart; the same
+   * button named "View project — Halcyon" is worth listing.
+   */
+  describedAs?: string;
   className?: string;
   variant?: "solid" | "outline" | "accent";
   strength?: number;
@@ -66,6 +74,7 @@ export function MagneticButton({
     <Tag
       ref={ref}
       {...(type ? { type, disabled } : { href })}
+      aria-label={describedAs}
       onClick={onClick}
       style={{ x, y }}
       onMouseMove={onMove}

@@ -5,6 +5,7 @@ import { MaskLine, Reveal } from "@/components/ui/Reveal";
 import { RisingText } from "@/components/ui/RisingText";
 import { ZoomPlate } from "@/components/ui/ZoomPlate";
 import { CountUp } from "@/components/ui/CountUp";
+import { MagneticButton } from "@/components/ui/MagneticButton";
 import type { Project } from "@/data/site";
 import { cn } from "@/lib/utils";
 
@@ -137,10 +138,18 @@ export function ProjectOutcome({ project }: { project: Project }) {
 /**
  * The next project, so the page has somewhere to go that is not backwards.
  *
- * The whole card is one link and the button under it is a span dressed as one.
- * It was a MagneticButton to begin with, which is an anchor — an anchor inside
- * an anchor is invalid, and a screen reader is handed two controls for one
- * destination. The card already carries the click.
+ * Built the same way as a row on the home page, and for the same reason.
+ *
+ * This card used to be one big anchor with the button inside it drawn as a
+ * span, because an anchor inside an anchor is invalid. That kept the markup
+ * honest and made the button dead: no lean toward the pointer, no letters
+ * rising on hover — the one button on the site that did nothing when you
+ * touched it, sitting next to six that did.
+ *
+ * So the card is no longer the link. The cover is its own link, skipped by Tab
+ * and hidden from assistive tech, and the button beside it is the real one —
+ * the same MagneticButton the index rows use, with the same lean and the same
+ * letter stagger. One destination, one announced control, and nothing nested.
  */
 export function ProjectNext({ next }: { next: Project }) {
   return (
@@ -150,10 +159,14 @@ export function ProjectNext({ next }: { next: Project }) {
           <MarqueeLabel text="Next project" width="12rem" />
         </Reveal>
 
-        <a
-          href={`/projects/${next.slug}`}
-          className="group grid items-center gap-8 lg:grid-cols-[1.2fr_1fr] lg:gap-16"
-        >
+        <div className="group grid items-center gap-8 lg:grid-cols-[1.2fr_1fr] lg:gap-16">
+          <a
+            href={`/projects/${next.slug}`}
+            tabIndex={-1}
+            aria-hidden="true"
+            data-cursor="view"
+            className="block"
+          >
           <motion.div
             // Tagged like an index row, so clicking through from one project
             // to the next carries this plate rather than cross-fading two
@@ -172,6 +185,7 @@ export function ProjectNext({ next }: { next: Project }) {
               className="aspect-[3/2] w-full object-cover transition-transform duration-700 ease-soft group-hover:scale-[1.04]"
             />
           </motion.div>
+          </a>
 
           <Reveal delay={0.1}>
             <p className="font-sans text-2xs font-semibold uppercase tracking-wider text-accent">
@@ -183,17 +197,16 @@ export function ProjectNext({ next }: { next: Project }) {
             <p className="mt-4 font-sans text-2xs uppercase tracking-wider text-dim">
               {next.tags}
             </p>
-            <span
-              className="mt-8 inline-flex select-none items-center overflow-hidden rounded-md px-8 py-[18px] font-sans text-2xs font-semibold uppercase tracking-wider text-paper"
-              style={{
-                backgroundImage:
-                  `linear-gradient(135deg, rgb(var(--c-accent)) 0%, rgb(var(--c-accent-warm)) 100%)`,
-              }}
-            >
-              View project
-            </span>
+            <div className="mt-8">
+              <MagneticButton
+                label="View project"
+                describedAs={`View project — ${next.title}`}
+                href={`/projects/${next.slug}`}
+                variant="accent"
+              />
+            </div>
           </Reveal>
-        </a>
+        </div>
       </div>
     </section>
   );

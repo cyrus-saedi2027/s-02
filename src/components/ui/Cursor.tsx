@@ -12,10 +12,40 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
  *   "comet"   a precise dot sitting at the centre of a filled circle, which
  *             draws out into a tail behind it as the pointer moves.
  *
- * Elements opt into states through `data-cursor`: "hide" | "view" | "drag".
+ * Elements opt into states through `data-cursor`, and the vocabulary is
+ * deliberately small: a verb for what the thing under the pointer does, or
+ * nothing. Adding one is a line in LOOK below and the attribute on the element.
  */
 export type CursorVariant = "ring" | "comet";
-type State = "default" | "hide" | "view" | "drag";
+type State = "default" | "hide" | "view" | "read" | "drag";
+
+/**
+ * What the pointer looks like in each state.
+ *
+ * One table rather than a chain of ternaries, so a new state cannot be added
+ * to the shape and forgotten in the label, or sized in one variant and not the
+ * other.
+ *
+ * The colours are the palette's own variables, which is what makes this work
+ * in both themes: `--c-paper` is the foreground and `--c-ink` the ground, so
+ * they swap together and the disc is always the opposite of the page. The disc
+ * used to be a hard-coded `#ffffff` with dark text — white on white once the
+ * light theme existed, which is to say invisible.
+ *
+ * The accent disc keeps a white label in both themes rather than following the
+ * palette: the accent is a saturated red either way, and near-black on it
+ * measures 4.2:1 where white measures 5.0:1.
+ */
+const LOOK: Record<
+  State,
+  { size: number; border: number; bg: string; label?: string; fg?: string; opacity?: number }
+> = {
+  default: { size: 34, border: 1, bg: "rgba(255,255,255,0)" },
+  hide: { size: 54, border: 1, bg: "rgba(255,255,255,0)", opacity: 0.5 },
+  view: { size: 104, border: 0, bg: "rgb(var(--c-accent))", label: "View", fg: "#fff" },
+  read: { size: 92, border: 0, bg: "rgb(var(--c-paper))", label: "Read", fg: "rgb(var(--c-ink))" },
+  drag: { size: 76, border: 0, bg: "rgb(var(--c-paper))", label: "Drag", fg: "rgb(var(--c-ink))" },
+};
 
 /** How often to re-check what sits under the pointer. */
 const HIT_TEST_MS = 70;
@@ -92,7 +122,7 @@ export function Cursor({ variant = "ring" }: { variant?: CursorVariant }) {
           <motion.div
             className="absolute left-0 top-0 h-1.5 w-1.5 rounded-full bg-paper"
             style={{ x, y, translateX: "-50%", translateY: "-50%" }}
-            animate={{ opacity: state === "view" || state === "drag" ? 0 : 1 }}
+            animate={{ opacity: LOOK[state].label ? 0 : 1 }}
           />
         </>
       )}
@@ -107,14 +137,14 @@ function RingFollower({ x, y, state }: { x: MV; y: MV; state: State }) {
   const rx = useSpring(x, { stiffness: 380, damping: 34, mass: 0.5 });
   const ry = useSpring(y, { stiffness: 380, damping: 34, mass: 0.5 });
 
-  const shape =
-    state === "view"
-      ? { width: 104, height: 104, borderWidth: 0, background: "var(--accent)", opacity: 1 }
-      : state === "drag"
-        ? { width: 76, height: 76, borderWidth: 0, background: "#ffffff", opacity: 1 }
-        : state === "hide"
-          ? { width: 54, height: 54, borderWidth: 1, background: "rgba(255,255,255,0)", opacity: 0.5 }
-          : { width: 34, height: 34, borderWidth: 1, background: "rgba(255,255,255,0)", opacity: 1 };
+  const look = LOOK[state];
+  const shape = {
+    width: look.size,
+    height: look.size,
+    borderWidth: look.border,
+    background: look.bg,
+    opacity: look.opacity ?? 1,
+  };
 
   return (
     <motion.div
@@ -157,8 +187,10 @@ function taperedCapsule(R: number, r: number, d: number) {
   ].join(" ");
 }
 
+/** The comet's head radius per state — half the ring's diameter, near enough. */
 const BASE_FOR: Record<State, number> = {
   view: 50,
+  read: 44,
   drag: 36,
   hide: 24,
   default: 14,
@@ -287,16 +319,17 @@ function CometFollower({ x, y, state }: { x: MV; y: MV; state: State }) {
 }
 
 function CursorLabel({ state }: { state: State }) {
-  if (state !== "view" && state !== "drag") return null;
+  const { label, fg } = LOOK[state];
+  if (!label) return null;
   return (
     <motion.span
+      key={label}
       initial={{ opacity: 0, scale: 0.7 }}
       animate={{ opacity: 1, scale: 1 }}
-      className={`font-sans text-[10px] font-bold uppercase tracking-wider ${
-        state === "view" ? "text-paper" : "text-ink"
-      }`}
+      style={{ color: fg }}
+      className="font-sans text-[10px] font-bold uppercase tracking-wider"
     >
-      {state === "view" ? "View" : "Drag"}
+      {label}
     </motion.span>
   );
 }

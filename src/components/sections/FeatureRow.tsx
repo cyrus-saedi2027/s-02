@@ -99,7 +99,23 @@ export function FeatureRow({
           : "lg:grid-cols-[1fr_1.28fr] lg:[&>*:first-child]:order-2"
       }`}
     >
-      {/* Cover */}
+      {/* Cover.
+          A link, because it is the thing anyone actually aims at — and because
+          the pointer now says "View" over it, which would be a promise the
+          plate could not keep otherwise. It leans toward the pointer, so it
+          already reads as interactive; before this, clicking it did nothing.
+
+          Hidden from assistive tech and skipped by Tab: the "View project"
+          button below goes to the same page and is the one that should be
+          announced. Two links to one project is noise, not access. Not
+          focusable, so `aria-hidden` here is honest rather than a trap. */}
+      <a
+        href={`/projects/${project.slug}`}
+        tabIndex={-1}
+        aria-hidden="true"
+        data-cursor="view"
+        className="block"
+      >
       <motion.div
         // The handle the click handler finds this plate by, so it can lend it
         // its view-transition-name on the way into the project page.
@@ -136,6 +152,7 @@ export function FeatureRow({
           className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-paper/10"
         />
       </motion.div>
+      </a>
 
       {/* Copy */}
       <motion.div
@@ -157,6 +174,7 @@ export function FeatureRow({
         <div className="mt-8">
           <MagneticButton
             label="View project"
+            describedAs={`View project — ${project.title}`}
             href={`/projects/${project.slug}`}
             variant="accent"
           />

@@ -30,7 +30,11 @@ export default function WritingPage({ onBook }: { onBook: () => void }) {
                 transition={{ duration: 0.7, ease: EASE, delay: Math.min(i, 3) * 0.06 }}
                 className="group border-b border-hair"
               >
-                <a href={`/writing/${n.slug}`} className="block py-10 md:py-14">
+                <a
+                  href={`/writing/${n.slug}`}
+                  data-cursor="read"
+                  className="block py-10 md:py-14"
+                >
                   <div className="flex flex-wrap items-baseline gap-x-5 gap-y-2 font-sans text-2xs uppercase tracking-wider text-dim">
                     <span className="text-accent">{n.topic}</span>
                     <span>{longDate(n.date)}</span>
