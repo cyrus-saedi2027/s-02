@@ -821,20 +821,39 @@ export const faqs = [
  * shorter ones simply stop, which is what leaves the wall its air: the grid is
  * not there to be filled. `wide` takes two of the four columns.
  */
-export type WallTile = { src: string; alt: string; ratio: number; wide?: boolean };
+/**
+ * What a study is about, so the wall can be filtered by it.
+ *
+ * Four kinds over thirteen plates, read from the artwork rather than from the
+ * descriptions: the plates fall into families by construction — window chrome
+ * and panels, a letterform, line work (perspective grids and contours), and
+ * solid forms (shapes and bars) — and that is what the filter offers.
+ *
+ * The counts are uneven, and the chips carry them, so a small group reads as a
+ * fact about the collection rather than as something failing to load.
+ */
+export type WallKind = "Interface" | "Type" | "Line" | "Form";
+
+export type WallTile = {
+  src: string;
+  alt: string;
+  ratio: number;
+  wide?: boolean;
+  kind: WallKind;
+};
 
 export const playgroundWall: WallTile[] = [
-  { src: "/art/play-01.svg", alt: "Study: a banded field over a dark ground", ratio: 1.315 },
-  { src: "/art/play-02.svg", alt: "Study: stacked arcs in vermilion", ratio: 0.749 },
-  { src: "/art/play-03.svg", alt: "Study: contour lines drifting off the frame", ratio: 0.877 },
-  { src: "/art/play-04.svg", alt: "Study: loose shapes over an ember ground", ratio: 1.31 },
-  { src: "/art/play-05.svg", alt: "Plate: a specimen sheet, set large", ratio: 1.167, wide: true },
-  { src: "/art/play-06.svg", alt: "Study: vertical bars, unevenly spaced", ratio: 1.315 },
-  { src: "/art/play-07.svg", alt: "Study: an interface mock in near-black", ratio: 1.31 },
-  { src: "/art/play-08.svg", alt: "Study: contours crossing a warm field", ratio: 0.877 },
-  { src: "/art/play-09.svg", alt: "Study: a lettering specimen, cropped", ratio: 1.31 },
-  { src: "/art/play-10.svg", alt: "Plate: a mesh dissolving toward one corner", ratio: 1.233, wide: true },
-  { src: "/art/play-11.svg", alt: "Plate: overlapping planes in ember", ratio: 1.233, wide: true },
-  { src: "/art/play-12.svg", alt: "Study: bars against a deep ground", ratio: 1.31 },
-  { src: "/art/play-13.svg", alt: "Study: contour lines over vermilion", ratio: 0.877 },
+  { src: "/art/play-01.svg", alt: "Study: an interface mock, panels over a dark ground", ratio: 1.315, kind: "Interface" },
+  { src: "/art/play-02.svg", alt: "Study: a perspective grid running to a lit horizon", ratio: 0.749, kind: "Line" },
+  { src: "/art/play-03.svg", alt: "Study: contour lines drifting off the frame", ratio: 0.877, kind: "Line" },
+  { src: "/art/play-04.svg", alt: "Study: loose shapes over an ember ground", ratio: 1.31, kind: "Form" },
+  { src: "/art/play-05.svg", alt: "Plate: a single letterform, set large", ratio: 1.167, wide: true, kind: "Type" },
+  { src: "/art/play-06.svg", alt: "Study: vertical bars, unevenly spaced", ratio: 1.315, kind: "Form" },
+  { src: "/art/play-07.svg", alt: "Study: an interface mock in near-black", ratio: 1.31, kind: "Interface" },
+  { src: "/art/play-08.svg", alt: "Study: contours crossing a warm field", ratio: 0.877, kind: "Line" },
+  { src: "/art/play-09.svg", alt: "Study: a perspective grid over a deep ground", ratio: 1.31, kind: "Line" },
+  { src: "/art/play-10.svg", alt: "Plate: a letterform cropped by the frame", ratio: 1.233, wide: true, kind: "Type" },
+  { src: "/art/play-11.svg", alt: "Plate: overlapping planes in ember", ratio: 1.233, wide: true, kind: "Form" },
+  { src: "/art/play-12.svg", alt: "Study: bars against a deep ground", ratio: 1.31, kind: "Form" },
+  { src: "/art/play-13.svg", alt: "Study: contour lines over vermilion", ratio: 0.877, kind: "Line" },
 ];
