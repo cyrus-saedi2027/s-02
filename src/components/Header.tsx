@@ -29,8 +29,14 @@ export function Header({
       className="pointer-events-none fixed inset-x-0 top-0 z-[80]"
     >
       <div className="relative flex items-start justify-between px-[var(--shell-x)] py-5 md:py-6">
+        {/* The route, not an anchor. This was `#home`, an id that only the
+            home page's hero carries — so from About, a project or anywhere
+            else the click found no element and did nothing at all. As a route
+            it goes home from everywhere, and the shell already turns a link to
+            the page you are already on into a scroll back to the top. */}
         <a
-          href="#home"
+          href="/"
+          aria-label="Zayla Monroe — home"
           onMouseEnter={() => setHoverMark(true)}
           onMouseLeave={() => setHoverMark(false)}
           className="pointer-events-auto inline-flex font-sans text-xs font-bold uppercase tracking-wide md:text-base"

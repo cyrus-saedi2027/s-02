@@ -37,9 +37,15 @@ export function MarqueeLabel({
     <div
       className={cn("relative overflow-hidden", className)}
       style={{ width, maskImage: fade, WebkitMaskImage: fade }}
-      aria-label={text}
     >
+      {/* The label, once. `aria-label` on a plain div is not a name a browser
+          is obliged to use, and the track carries the text eight times over —
+          four copies in each half — so what was actually announced was the
+          eyebrow repeated four times. */}
+      <span className="sr-only">{text}</span>
+
       <div
+        aria-hidden="true"
         className={cn(
           "flex w-max flex-nowrap",
           reverse ? "animate-marquee-reverse" : "animate-marquee"

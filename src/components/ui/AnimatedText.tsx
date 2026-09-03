@@ -53,7 +53,15 @@ export function AnimatedHeadline({
   let charIndex = 0;
 
   return (
+    <>
+      {/* The line, once, for anything that reads rather than looks.
+          Every glyph below is its own inline-block, and a name computed from
+          boxes rather than from text puts a space between each of them — this
+          headline was announced "R e a d y   t o   T r a n s f o r m". The
+          split is decoration; the sentence is here. */}
+      <span className="sr-only">{words.map((w) => w.text).join(" ")}</span>
     <motion.span
+      aria-hidden="true"
       className={cn("flex flex-wrap", className)}
       variants={container}
       custom={stagger}
@@ -88,6 +96,7 @@ export function AnimatedHeadline({
         </span>
       ))}
     </motion.span>
+    </>
   );
 }
 
@@ -106,8 +115,14 @@ export function HoverStaggerLabel({
 }) {
   return (
     <span className={cn("relative inline-flex overflow-hidden", className)}>
+      {/* The label itself, for anything that reads rather than looks. Both
+          layers below are per-glyph inline-blocks, and a name computed from
+          boxes puts a space between each one — every link on the site was
+          announced "C O N T A C T". */}
+      <span className="sr-only">{text}</span>
+
       {/* Resting layer */}
-      <span className="inline-flex" aria-hidden={false}>
+      <span className="inline-flex" aria-hidden="true">
         {[...text].map((ch, i) => (
           <motion.span
             key={i}

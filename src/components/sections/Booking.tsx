@@ -35,7 +35,7 @@ import { lockScroll, unlockScroll } from "@/lib/scrollLock";
 const EASE = [0.22, 1, 0.36, 1] as const;
 /** Slow away, quick through the middle, slow in — the sweep between steps. */
 const SWEEP_EASE = [0.65, 0, 0.35, 1] as const;
-const SWEEP = 2.7;
+const SWEEP = 1;
 /** Steps in order, so a move between two of them has a direction. */
 const ORDER: Step[] = ["pick", "details", "done"];
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -192,30 +192,40 @@ type Frame = { key: string; node: ReactNode; index: number };
  * having been undone. The card's height is tweened alongside on the same curve,
  * or the swap would end with a jump wherever two steps differ in length.
  *
- * The timing is the delicate part. React commits the new step before any effect
- * runs, so an ordinary `useEffect` lets the browser paint one frame of it —
- * unclipped, at its own height — before the sweep has a chance to start. That
- * single frame is the flicker you feel just ahead of the line. Everything that
- * sets the sweep up therefore happens in a layout effect, and the clip and the
- * height are set on the motion values *before* the render that binds them, so
- * the first painted frame is already the frozen one.
+ * Two slots, and a step keeps the one it arrived in for as long as it lives.
+ *
+ * That is the whole trick, and it is worth saying why, because the obvious
+ * shape is wrong in a way that is easy to miss. Rendering the outgoing step
+ * into a container of its own looks like freezing it, and is not: React
+ * reconciles by position, so the same markup appearing under a different
+ * parent is a fresh mount, and every `initial` inside it plays again. Picking
+ * a time, sixteen slot buttons re-ran their fade the instant the sweep began —
+ * measured, one frame after the click, as sixteen opacity animations running
+ * inside the copy that was supposed to be standing still. That blink is what
+ * you felt just before the step changed.
+ *
+ * Keeping each step in its own slot means the one on its way out is the very
+ * subtree that was already on screen. It is not re-mounted, not re-animated,
+ * and not rebuilt — only its slot's class changes, from the one in flow to the
+ * one underneath. It is also cheaper than the copy it replaces, which mounted
+ * a second tree of some hundred and forty nodes to show what was already there.
+ *
+ * The swap has to happen in the same render that brings the new step in, or
+ * the slot holding the old one is overwritten before anything can hold on to
+ * it — hence the adjustment during render rather than in an effect. React
+ * restarts the render immediately and nothing is painted in between.
  */
 function Wipe({ frame }: { frame: Frame }) {
-  // The live node is rendered every time. Only the *outgoing* step is frozen —
-  // it is on its way out, so a snapshot is right for it, and snapshotting the
-  // incoming one instead would leave the panel showing stale markup for as long
-  // as the step lasted.
-  const [outgoing, setOutgoing] = useState<ReactNode | null>(null);
+  /** Which slot the live step is in. Flips on every change. */
+  const [parity, setParity] = useState<0 | 1>(0);
+  const [shown, setShown] = useState({ key: frame.key, index: frame.index });
+  /** What the other slot keeps rendering while the sweep runs. */
+  const [held, setHeld] = useState<ReactNode | null>(null);
   const [dir, setDir] = useState<1 | -1>(1);
   const [busy, setBusy] = useState(false);
-  const shown = useRef(frame);
-  const shownNode = useRef<ReactNode>(frame.node);
-  /** The panel's height while it is at rest — the height to sweep away from. */
-  const resting = useRef(0);
 
   const shell = useRef<HTMLDivElement>(null);
-  const outBox = useRef<HTMLDivElement>(null);
-  const inBox = useRef<HTMLDivElement>(null);
+  const box = useRef<[HTMLDivElement | null, HTMLDivElement | null]>([null, null]);
 
   const cut = useMotionValue(100);
   const height = useMotionValue(0);
@@ -226,20 +236,20 @@ function Wipe({ frame }: { frame: Frame }) {
   const clip = dir === 1 ? clipL : clipR;
   const edge = dir === 1 ? edgeL : edgeR;
 
-  useLayoutEffect(() => {
-    if (frame.key === shown.current.key) return;
-    // Set up before the state change, so the render that first binds these
-    // styles already reads the frozen values rather than last sweep's.
-    height.set(resting.current || inBox.current?.offsetHeight || 0);
-    cut.set(100);
-    setDir(frame.index >= shown.current.index ? 1 : -1);
-    setOutgoing(shownNode.current);
-    setBusy(true);
-    shown.current = frame;
-  }, [frame, cut, height]);
+  // The node currently on screen, so the render below can hand it to the slot
+  // it is about to vacate the lead in.
+  const shownNode = useRef<ReactNode>(frame.node);
 
-  // Declared after the effect above, so on the render where the step changes
-  // that one still sees the previous node before this replaces it.
+  if (frame.key !== shown.key) {
+    setDir(frame.index >= shown.index ? 1 : -1);
+    setHeld(shownNode.current);
+    setParity((p) => (p === 0 ? 1 : 0));
+    setShown({ key: frame.key, index: frame.index });
+    setBusy(true);
+  }
+
+  // Declared after the block above, so on the render where the step changes
+  // that block still sees the previous node before this replaces it.
   useEffect(() => {
     shownNode.current = frame.node;
   });
@@ -257,7 +267,7 @@ function Wipe({ frame }: { frame: Frame }) {
    */
   useLayoutEffect(() => {
     if (busy) return;
-    for (const el of [shell.current, inBox.current]) {
+    for (const el of [shell.current, box.current[0], box.current[1]]) {
       if (!el) continue;
       for (const prop of ["height", "clip-path", "-webkit-clip-path", "will-change"]) {
         el.style.removeProperty(prop);
@@ -265,31 +275,27 @@ function Wipe({ frame }: { frame: Frame }) {
     }
   }, [busy]);
 
-  // Kept current while the panel is at rest — including as a step grows a field
-  // or opens a menu — so a sweep always starts from the height on screen.
-  useEffect(() => {
-    if (busy) return;
-    const el = inBox.current;
-    if (!el) return;
-    const measure = () => {
-      resting.current = el.offsetHeight;
-    };
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [busy]);
-
   useLayoutEffect(() => {
     if (!busy) return;
-    const to = inBox.current?.offsetHeight ?? height.get();
+    // Both heights are readable here and neither is a guess: the step going
+    // away is still mounted in the other slot, so the sweep starts from the
+    // height that is actually on screen rather than from one remembered by a
+    // resize observer and hoped to be current.
+    const from = box.current[parity === 0 ? 1 : 0]?.offsetHeight ?? 0;
+    const to = box.current[parity]?.offsetHeight ?? from;
+
+    // Set before the animation rather than left over from the last sweep. A
+    // layout effect runs before paint, so the stale value bound at render time
+    // is written and replaced without ever reaching the screen.
+    height.set(from);
+    cut.set(100);
 
     const sweep = animate(cut, 0, { duration: SWEEP, ease: SWEEP_EASE });
     const grow = animate(height, to, { duration: SWEEP, ease: SWEEP_EASE });
     let finished = false;
     sweep.then(() => {
       finished = true;
-      setOutgoing(null);
+      setHeld(null);
       setBusy(false);
     });
     return () => {
@@ -298,7 +304,7 @@ function Wipe({ frame }: { frame: Frame }) {
         grow.stop();
       }
     };
-  }, [busy, cut, height]);
+  }, [busy, parity, cut, height]);
 
   return (
     <motion.div
@@ -306,26 +312,40 @@ function Wipe({ frame }: { frame: Frame }) {
       className="relative overflow-hidden"
       style={busy ? { height, willChange: "height" } : undefined}
     >
-      {/* Outgoing sits underneath and still; incoming is clipped open over it. */}
-      {outgoing && (
-        <div ref={outBox} className="absolute inset-x-0 top-0 bg-surface" aria-hidden="true">
-          {outgoing}
-        </div>
-      )}
-
-      {/* Opaque, or the step underneath reads through the part already swept. */}
-      <motion.div
-        ref={inBox}
-        style={busy ? { clipPath: clip, WebkitClipPath: clip, willChange: "clip-path" } : undefined}
-        className={busy ? "relative bg-surface" : undefined}
-      >
-        {frame.node}
-      </motion.div>
+      {([0, 1] as const).map((i) => {
+        const live = i === parity;
+        return (
+          <motion.div
+            key={i}
+            ref={(el: HTMLDivElement | null) => {
+              box.current[i] = el;
+            }}
+            aria-hidden={live ? undefined : true}
+            // Only the live slot is clipped open; the one underneath is left
+            // exactly as it was drawn.
+            style={
+              busy && live
+                ? { clipPath: clip, WebkitClipPath: clip, willChange: "clip-path" }
+                : undefined
+            }
+            // Stacked by z-index rather than by document order, so which slot
+            // is on top follows the parity and not the order they happen to be
+            // written in. Opaque while sweeping, or the step underneath reads
+            // through the part already swept.
+            className={cn(
+              live ? "relative z-10" : "absolute inset-x-0 top-0 z-0",
+              busy && "bg-surface"
+            )}
+          >
+            {live ? frame.node : held}
+          </motion.div>
+        );
+      })}
 
       {busy && (
         <motion.span
           aria-hidden="true"
-          className="pointer-events-none absolute inset-y-0 w-px bg-accent"
+          className="pointer-events-none absolute inset-y-0 z-20 w-px bg-accent"
           style={{ left: edge, boxShadow: "0 0 24px 2px rgba(253,50,28,0.55)" }}
         />
       )}

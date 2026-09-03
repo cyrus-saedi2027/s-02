@@ -228,26 +228,34 @@ function Shell() {
         // Going to a project page, the plate that was clicked travels with you.
         const cover = visibleCover(path.match(PROJECT_PATH)?.[1] ?? "");
 
-        // A project page's own hero answers to the same name. Leaving one for
-        // another, both it and the plate just clicked would claim it — two
-        // elements holding one view-transition-name is invalid and the browser
-        // drops the transition, which is exactly what going from one project
-        // to the next used to look like. The outgoing hero stands down.
-        const outgoingHero = cover
-          ? document.querySelector<HTMLElement>("[data-project-hero]")
-          : null;
+        // The wipe belongs to the main pages — every one of them, arrived at
+        // from anywhere. Only *opening* a project sits it out, because there
+        // the cover growing into the next page's hero is already the story and
+        // running both read as a stutter. Leaving a project for a main page is
+        // a change of page like any other and gets the wipe; it used to be
+        // suppressed as well, which is why coming back from a project felt
+        // like a different site than going anywhere else.
+        const intoProject = PROJECT_PATH.test(path);
+
+        // A project page's hero answers to `project-cover` for as long as it is
+        // on screen, and that has to be taken off it in every case but one.
+        //
+        // Leaving one project for another, both it and the plate just clicked
+        // would claim the name — two elements holding one is invalid and the
+        // browser drops the transition, which is exactly what going from one
+        // project to the next used to look like. And leaving a project for a
+        // main page, a hero still wearing the name is lifted out of the root
+        // snapshot and fades on its own *over* the wipe, which is the whole
+        // page changing behind one picture that will not go with it.
+        //
+        // So: the outgoing hero stands down unless it is itself the plate
+        // travelling, which it never is — the name is on the cover, the hero
+        // is what the cover lands on.
+        const outgoingHero = document.querySelector<HTMLElement>("[data-project-hero]");
         if (outgoingHero && outgoingHero !== cover) {
           outgoingHero.setAttribute("data-vt-suppress", "");
         }
         if (cover) cover.style.viewTransitionName = "project-cover";
-
-        // The wipe is for moving between the main pages. Opening or leaving a
-        // project gets the quiet fade instead: the cover growing into the next
-        // hero already says a page has changed, and running both read as a
-        // stutter — the plate finished travelling half a second before the
-        // page behind it arrived.
-        const intoOrOutOfProject =
-          PROJECT_PATH.test(path) || PROJECT_PATH.test(location.pathname);
 
         withPageTransition(
           () => {
@@ -262,31 +270,41 @@ function Shell() {
             flushSync(() => navigate(path + url.hash));
             if (!url.hash) window.scrollTo(0, 0);
 
-            // Both handoffs are undone here rather than in `done`, because
-            // the API captures the old state before this callback runs and the
-            // new state after it returns — and React reuses these very DOM
-            // nodes across one project and the next.
-            //
-            // The hero: an attribute left on past this point silences it in
-            // the new capture too, so the plate is lifted out with nowhere to
-            // land. The cover: the next-project card that was clicked is
-            // still the next-project card afterwards, pointing at a different
-            // project — and if it is still wearing the name, it and the
-            // incoming hero both claim it. The browser says so out loud
-            // ("Unexpected duplicate view-transition-name") and drops the
-            // whole transition, which is what one project opening another
-            // used to look like.
-            outgoingHero?.removeAttribute("data-vt-suppress");
-            if (cover) cover.style.viewTransitionName = "";
+            // The handoff is undone here rather than in `done`, because the
+            // API captures the old state before this callback runs and the new
+            // state after it returns — and React reuses these very DOM nodes
+            // across one project and the next.
+            if (cover) {
+              // The incoming hero has to be free to claim the name for the new
+              // capture, and going project to project it is the same node that
+              // just stood down. The cover gives the name back for the same
+              // reason: the next-project card that was clicked is still the
+              // next-project card afterwards, pointing at a different project,
+              // and if it kept the name it and the incoming hero would both
+              // claim it. The browser says so out loud ("Unexpected duplicate
+              // view-transition-name") and drops the whole transition.
+              outgoingHero?.removeAttribute("data-vt-suppress");
+              cover.style.viewTransitionName = "";
+            } else {
+              // Nothing is travelling — a project opened from a text link, or
+              // from a plate scrolled out of sight. Then the incoming hero has
+              // to stand down too, or it is lifted out of the new snapshot and
+              // fades in on its own timing while the page fades in on another.
+              document
+                .querySelector<HTMLElement>("[data-project-hero]")
+                ?.setAttribute("data-vt-suppress", "");
+            }
           },
           {
-            wipe: !intoOrOutOfProject,
+            wipe: !intoProject,
             done: () => {
               // Belt and braces: a transition that never started leaves the
-              // commit callback unrun, so the handoff has to be undone here
+              // commit callback unrun, so every handoff has to be undone here
               // too or the next one begins from a document with two claimants.
               if (cover) cover.style.viewTransitionName = "";
-              outgoingHero?.removeAttribute("data-vt-suppress");
+              document
+                .querySelectorAll<HTMLElement>("[data-vt-suppress]")
+                .forEach((el) => el.removeAttribute("data-vt-suppress"));
             },
           }
         );

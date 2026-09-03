@@ -30,7 +30,13 @@ export function RisingText({
   let i = 0;
 
   return (
+    <>
+      {/* The sentence, once. Each glyph below is its own inline-block, and a
+          name computed from boxes rather than from text puts a space between
+          them — the About intro was announced one letter at a time. */}
+      <span className="sr-only">{text}</span>
     <motion.span
+      aria-hidden="true"
       className={cn("inline", className)}
       initial="hidden"
       whileInView="show"
@@ -58,5 +64,6 @@ export function RisingText({
         </span>
       ))}
     </motion.span>
+    </>
   );
 }
