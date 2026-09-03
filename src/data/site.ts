@@ -527,19 +527,22 @@ export const navLinks = [
 /**
  * Where to find the studio elsewhere.
  *
+ * Two accounts, because two is what exists. The list used to carry Twitter,
+ * LinkedIn and Dribbble as well, all with nothing behind them — four names
+ * where two are dead reads worse than two that are real.
+ *
  * `href` is the whole configuration: fill one in and it becomes a link that
- * opens in a new tab; leave it empty and the name is rendered as plain text
- * instead. That is deliberate — an account nobody has set up yet should read
- * as "not on this platform", not as a link that swallows the click. These are
- * empty until real accounts exist to point at.
+ * opens in a new tab; leave it empty and the name still renders, and still
+ * answers the pointer, but nothing takes the click. An account nobody has set
+ * up should read as "not there yet" rather than as a link that swallows a
+ * click — which is what a bare `#` did, and on a site whose routes live in the
+ * hash it also dropped the reader back on the home page.
  */
 export type Social = { label: string; href: string };
 
 export const socials: Social[] = [
-  { label: "Instagram", href: "" },
-  { label: "Twitter", href: "" },
-  { label: "LinkedIn", href: "" },
-  { label: "Dribbble", href: "" },
+  { label: "Instagram", href: "https://www.instagram.com/mohammd_saedi83" },
+  { label: "Telegram", href: "https://t.me/Mohammad_s203" },
 ];
 
 /**

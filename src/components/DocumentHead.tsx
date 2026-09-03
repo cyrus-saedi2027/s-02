@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { identity, notes, projects } from "@/data/site";
+import { identity, notes, projects, socials } from "@/data/site";
 
 const SITE = (import.meta.env.VITE_SITE_URL ?? "https://zaylamonroe.com").replace(/\/+$/, "");
 
@@ -121,6 +121,9 @@ export function DocumentHead() {
             email: `mailto:${identity.email}`,
             url: SITE,
             address: { "@type": "PostalAddress", addressLocality: "Amsterdam", addressCountry: "NL" },
+            // The accounts that are actually configured, and only those — an
+            // empty string in `sameAs` is a claim to a profile that is not there.
+            sameAs: socials.map((s) => s.href).filter(Boolean),
             knowsAbout: ["Brand identity", "Interface design", "Motion design", "Front-end development"],
           }
     );

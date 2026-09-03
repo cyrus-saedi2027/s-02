@@ -7,14 +7,19 @@ import { cn } from "@/lib/utils";
  * One account, in the footer or on the contact page.
  *
  * A configured `href` gets a real link, opened in a new tab and marked as
- * such. An empty one gets plain text — dimmed, not hoverable, not focusable.
- * The alternative, which is what this site shipped with, is a link to `#`: it
- * looks live, takes the click, and does nothing with it. Worse than that on a
- * site whose routes live in the hash, where the browser's default for a bare
- * `#` rewrites the address and drops the reader back on the home page.
+ * such. An empty one is not a link at all — nothing takes the click, and
+ * nothing is focusable. A link to `#` was the old behaviour: it looked live,
+ * took the click and did nothing with it, and on a site whose routes live in
+ * the hash the browser's default for a bare `#` rewrote the address and
+ * dropped the reader back on the home page.
  *
- * So there is nothing to configure but the URL. Fill one in and it becomes a
- * link; leave it out and the name still reads, as a fact rather than an offer.
+ * Both states carry the same letter stagger on hover. Turning it off for the
+ * unconfigured ones made them look switched off rather than simply not linked
+ * yet, and the stagger is decoration — unlike a pointer or a cursor label, it
+ * does not promise that a click will go anywhere.
+ *
+ * So there is nothing to configure but the URL. Fill one in and the name
+ * becomes a link, with no other change anywhere.
  */
 export function SocialLink({
   social,
@@ -25,9 +30,17 @@ export function SocialLink({
 }) {
   const [hover, setHover] = useState(false);
 
+  const label = <HoverStaggerLabel text={social.label} active={hover} />;
+  const watch = {
+    onMouseEnter: () => setHover(true),
+    onMouseLeave: () => setHover(false),
+  };
+
   if (!social.href) {
     return (
-      <span className={cn("inline-flex text-dimmer", className)}>{social.label}</span>
+      <span {...watch} className={cn("inline-flex text-dimmer", className)}>
+        {label}
+      </span>
     );
   }
 
@@ -36,14 +49,13 @@ export function SocialLink({
       href={social.href}
       target="_blank"
       rel="noopener noreferrer"
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
+      {...watch}
       className={cn(
         "inline-flex transition-colors duration-300 hover:text-accent",
         className
       )}
     >
-      <HoverStaggerLabel text={social.label} active={hover} />
+      {label}
       <span className="sr-only"> (opens in a new tab)</span>
     </a>
   );
