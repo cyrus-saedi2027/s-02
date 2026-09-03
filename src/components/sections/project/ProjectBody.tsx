@@ -1,5 +1,6 @@
-import { useRef } from "react";
-import { motion } from "framer-motion";
+import { useLayoutEffect, useRef, useState } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useMediaQuery, useReducedMotion } from "@/hooks/useMediaQuery";
 import { MarqueeLabel } from "@/components/ui/MarqueeLabel";
 import { MaskLine, Reveal } from "@/components/ui/Reveal";
 import { RisingText } from "@/components/ui/RisingText";
@@ -40,12 +41,130 @@ export function ProjectProblem({ project }: { project: Project }) {
  * rhythm the projects index uses, at a quieter scale.
  */
 export function ProjectChapters({ project }: { project: Project }) {
+  const calm = useReducedMotion();
+  const wide = useMediaQuery("(min-width: 1024px)");
+  const fine = useMediaQuery("(pointer: fine)");
+
+  // Two whole components rather than one that branches inside, so the hooks
+  // each of them needs are never conditional.
+  //
+  // The sideways track is for a wide screen with a wheel or a trackpad, and
+  // nowhere else. On a phone, turning a vertical scroll into a horizontal one
+  // fights the gesture the hand is already making; under a reduced-motion
+  // preference, moving the whole page sideways is the loudest thing on the
+  // site. Both get the stack, which is not a lesser version — it is the layout
+  // this section had, unchanged.
+  if (calm || !wide || !fine) return <StackedChapters project={project} />;
+  return <TrackChapters project={project} />;
+}
+
+/** The chapters one under the next: the layout everything but a wide desktop gets. */
+function StackedChapters({ project }: { project: Project }) {
   return (
     <section className="relative py-10 md:py-16">
       <div className="shell flex flex-col gap-20 md:gap-32">
         {project.chapters.map((c, i) => (
           <Chapter key={c.title} chapter={c} index={i} flipped={i % 2 === 1} />
         ))}
+      </div>
+    </section>
+  );
+}
+
+/**
+ * The chapters as one wide strip, pinned while it travels.
+ *
+ * The section is several screens tall and holds a viewport-high panel to its
+ * top edge; scrolling that height moves the strip inside it sideways. So the
+ * page keeps one scroll direction — nothing is hijacked, the wheel does what
+ * the wheel does — and the reading direction turns ninety degrees inside a
+ * frame that is standing still.
+ *
+ * The distance is measured, not assumed. A chapter card is sized in `vw` and
+ * the titles wrap differently per project, so the only honest travel is the
+ * strip's real width less one screen, re-measured whenever either changes.
+ * Assuming it would leave the last card short of the edge on one project and
+ * scroll past the end on another.
+ *
+ * `position: sticky` is what pins it, which is the reason the smooth-scroll
+ * hook drives `window.scrollTo` rather than transforming a wrapper — a
+ * transformed ancestor would take sticky out of the equation entirely and this
+ * section would simply scroll away.
+ */
+function TrackChapters({ project }: { project: Project }) {
+  const outer = useRef<HTMLDivElement>(null);
+  const strip = useRef<HTMLDivElement>(null);
+  const [distance, setDistance] = useState(0);
+
+  const { scrollYProgress } = useScroll({
+    target: outer,
+    offset: ["start start", "end end"],
+  });
+  const x = useTransform(scrollYProgress, [0, 1], [0, -distance]);
+  const progress = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
+
+  useLayoutEffect(() => {
+    const el = strip.current;
+    if (!el) return;
+    const measure = () => setDistance(Math.max(0, el.scrollWidth - window.innerWidth));
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    window.addEventListener("resize", measure);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, []);
+
+  return (
+    <section
+      ref={outer}
+      className="relative"
+      // One screen to read each chapter in, plus one to bring the strip to
+      // rest at the end rather than stopping it against the edge.
+      style={{ height: `${(project.chapters.length + 1) * 100}vh` }}
+    >
+      <div className="sticky top-0 flex h-screen flex-col justify-center overflow-hidden">
+        <motion.div
+          ref={strip}
+          style={{ x }}
+          className="flex w-max items-center gap-8 px-[var(--shell-x)]"
+        >
+          {project.chapters.map((c, i) => (
+            <article
+              key={c.title}
+              className="grid w-[min(74vw,1000px)] shrink-0 grid-cols-2 items-center gap-10"
+            >
+              <img
+                src={c.art}
+                alt={`${c.title} — supporting artwork`}
+                loading="lazy"
+                className="aspect-[4/3] w-full rounded-xl object-cover"
+              />
+              <div>
+                <p className="font-sans text-2xs font-semibold uppercase tracking-wider text-accent">
+                  / {String(i + 1).padStart(2, "0")}
+                </p>
+                <h3 className="mt-4 max-w-[18ch] text-[clamp(1.5rem,3vw,2.5rem)] font-medium leading-[1.05] tracking-tight">
+                  {c.title}
+                </h3>
+                <p className="mt-5 max-w-[46ch] font-sans text-sm leading-relaxed text-dim md:text-base">
+                  {c.body}
+                </p>
+              </div>
+            </article>
+          ))}
+        </motion.div>
+
+        {/* How far through the strip you are. A pinned section takes away the
+            scrollbar's answer to that question, so it has to give its own. */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-x-[var(--shell-x)] bottom-10 h-px bg-hairStrong"
+        >
+          <motion.span style={{ width: progress }} className="block h-px bg-accent" />
+        </div>
       </div>
     </section>
   );

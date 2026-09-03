@@ -4,6 +4,7 @@ import { MagneticButton } from "../ui/MagneticButton";
 import type { Project } from "@/data/site";
 import { useReducedMotion } from "@/hooks/useMediaQuery";
 import { usePointerLean } from "@/hooks/usePointerLean";
+import { RippleImage } from "@/components/ui/RippleImage";
 
 /**
  * Where the covers pivot from. `50% 180%` sits a little over one card-height
@@ -139,14 +140,12 @@ export function FeatureRow({
         }}
         className="relative overflow-hidden rounded-xl will-change-transform"
       >
-        <div className="aspect-[3/2] w-full overflow-hidden">
-          <img
-            src={project.cover}
-            alt={`${project.title} cover`}
-            loading="lazy"
-            className="h-full w-full object-cover"
-          />
-        </div>
+        <RippleImage
+          src={project.cover}
+          alt={`${project.title} cover`}
+          className="aspect-[3/2] w-full overflow-hidden"
+          imgClassName="h-full w-full object-cover"
+        />
         <span
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-paper/10"
