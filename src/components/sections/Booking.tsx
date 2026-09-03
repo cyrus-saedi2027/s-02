@@ -35,7 +35,14 @@ import { lockScroll, unlockScroll } from "@/lib/scrollLock";
 const EASE = [0.22, 1, 0.36, 1] as const;
 /** Slow away, quick through the middle, slow in — the sweep between steps. */
 const SWEEP_EASE = [0.65, 0, 0.35, 1] as const;
-const SWEEP = 1;
+/**
+ * Seconds for the line to cross the panel.
+ *
+ * This was 2.7 and briefly 1. One second turned out to be too brisk for what
+ * the line is doing — it is not a spinner, it is the panel changing its mind —
+ * and 1.65 is the speed that was asked for: six tenths of the last one.
+ */
+const SWEEP = 1.65;
 /** Steps in order, so a move between two of them has a direction. */
 const ORDER: Step[] = ["pick", "details", "done"];
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
